@@ -23,10 +23,7 @@ def center_on_image(img: np.array, x: int, y: int, zoom: float):
     w = int(width * zoom)
     h = int(height * zoom)
 
-    print(x - w//2, y - h//2, w, h)
-
     img = crop_image(img, x - w//2, y - h//2, w, h)
-    print(img.shape)
     return img
 
 if __name__ == "__main__":
@@ -37,15 +34,15 @@ if __name__ == "__main__":
     video = cv2.VideoWriter('video.mp4', cv2.VideoWriter_fourcc(*"mp4v"), fps, (width, height))
     #video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*"MJPG"), fps, (width, height))
 
-    zoom_stages = lerps_linear(1, 2, 5 * fps)
-    for i in range(5 * fps):
-        img_final = center_on_image(img, i * 7 + 300, i * 7 + 300, zoom_stages[i])
+    zoom_stages = lerps_linear(1, 0.1, 5 * fps) + [0.1] * 5 * fps
+    x = 1567
+    y = 1037
+    for i in range(10 * fps):
+        img_final = center_on_image(img, x, y, zoom_stages[i])
 
         shape = img_final.shape
         if (shape[0] != height or shape[1] != width):
-            img_final = cv2.resize(img_final, (width, height))#, interpolation=cv2.INTER_LINEAR)
-            print(f"Resizing: {img_final.shape}")
-
+            img_final = cv2.resize(img_final, (width, height), interpolation=cv2.INTER_CUBIC)
 
         video.write(img_final)
 
