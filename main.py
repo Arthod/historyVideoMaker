@@ -7,6 +7,11 @@ class Video:
     height = 1080
     fps = 60
 
+class VideoTest:
+    width = 1280
+    height = 720
+    fps = 60
+
 def lerps_linear(val_start: float, val_stop: float, count: int) -> list[float]:
     b = val_start
     a = (val_stop - b) / (count - 1)
@@ -36,7 +41,7 @@ def center_on_image(img: np.array, x: int, y: int, zoom: float):
 
 if __name__ == "__main__":
 
-    img = Map.get_nasa_map()
+    img = Map.get_ck3_map()
     print("Map creation completed")
 
 
@@ -45,9 +50,9 @@ if __name__ == "__main__":
 
     fps_total = 10 * Video.fps
 
-    zoom_stages = [3] * fps_total
-    xs = lerps_linear(21000, 26000, fps_total)
-    ys = lerps_linear(11800, 15000, fps_total)
+    zoom_stages = [1] * fps_total
+    xs = lerps_linear(3234, 3158, fps_total)
+    ys = lerps_linear(3109, 2491, fps_total)
     for i in range(fps_total):
         img_final = center_on_image(img, xs[i], ys[i], zoom_stages[i])
 

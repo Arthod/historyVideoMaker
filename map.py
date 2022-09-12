@@ -40,8 +40,10 @@ class Map:
         return img_curr
         
     def get_ck3_map():
+        
         river_map = cv2.imread("images/ck3map/rivers.png").astype("uint8")
         water_map = cv2.imread("images/ck3map/water.png").astype("uint8")
+        return water_map
         height_map = cv2.imread("images/ck3map/heightmap.png").astype("uint8")
         provinces_map = cv2.imread("images/ck3map/provinces.png").astype("uint8")
 
@@ -100,7 +102,7 @@ class Map:
         #map = desert_rocky_colored/255 * desert_rocky_mask/255 + map/255 * (1 - map_mask/255)
         #map_mask += desert_rocky_mask
 
-        return np.where(water_map == 255, np.ones(river_map.shape) * (255, 0, 0), map)
+        #return np.where(water_map == 255, np.ones(river_map.shape) * (255, 0, 0), map)
         return map
 
 
