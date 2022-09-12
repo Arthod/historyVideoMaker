@@ -7,7 +7,11 @@ class Video:
     height = 1080
     fps = 60
 
-class VideoTest:
+class Camera:
+    width = 1920
+    height = 1080
+
+class Video:
     width = 1280
     height = 720
     fps = 60
@@ -27,14 +31,14 @@ def crop_image(img: np.array, x: int, y: int, width: int, height: int) -> np.arr
     return img[y:y + height, x:x + width]
 
 def center_on_image(img: np.array, x: int, y: int, zoom: float):
-    x_margin = round(Video.width/2 * zoom)
+    x_margin = round(Camera.width/2 * zoom)
     x = round(max(min(x, img.shape[1] - x_margin), x_margin))
 
-    y_margin = round(Video.height/2 * zoom)
+    y_margin = round(Camera.height/2 * zoom)
     y = round(max(min(y, img.shape[0] - y_margin), y_margin))
 
-    width = round(Video.width * zoom)
-    height = round(Video.height * zoom)
+    width = round(Camera.width * zoom)
+    height = round(Camera.height * zoom)
 
     img = crop_image(img, x - width//2, y - height//2, width, height)
     return img
@@ -65,3 +69,28 @@ if __name__ == "__main__":
     video.release()
 
     print("Rendering complete")
+
+
+    # Play video
+    cap = cv2.VideoCapture("video.mp4")
+    # Check if camera opened successfully
+    if (cap.isOpened()== False):
+        print("Error opening video file")
+    
+    # Read until video is completed
+    while(cap.isOpened()):
+        
+    # Capture frame-by-frame
+        ret, frame = cap.read()
+        if ret == True:
+        # Display the resulting frame
+            cv2.imshow('Frame', frame)
+            
+        # Press Q on keyboard to exit
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                break
+    
+    # Break the loop
+        else:
+            break
+ 

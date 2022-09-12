@@ -105,6 +105,9 @@ class Map:
         #return np.where(water_map == 255, np.ones(river_map.shape) * (255, 0, 0), map)
         return map
 
+    def populate():
+
+        # https://youtu.be/qq76LCiP2Ds
 
 if __name__ == "__main__":
     img = Map.get_ck3_map()
