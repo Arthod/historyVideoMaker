@@ -4,30 +4,12 @@ import cv2
 import numpy as np
 
 class Map:
-    def get_ck2_map():
+    def __init__(self):
+        self.map_img = None
+        self.static_objects: list[MapObject] = []
+        self.dynamic_objects: list[MapObject] = []
 
-        colormap = cv2.imread("images/ck2map/colormap.png").astype("uint8")
-        colormap_water = cv2.imread("images/ck2map/colormap_water.png").astype("uint8")
-        rivers = cv2.imread("images/ck2map/rivers.png").astype("uint8")
-        terrain = cv2.imread("images/ck2map/terrain.png").astype("uint8")
-        topology = cv2.imread("images/ck2map/topology.png").astype("uint8")
-
-        return colormap
-
-    def get_nasa_map():
-        b1 = cv2.imread("images/nasaTest/b1.png")
-        c1 = cv2.imread("images/nasaTest/c1.png")
-        b1_top = cv2.imread("images/nasaTest/b1_top.png")
-        c1_top = cv2.imread("images/nasaTest/c1_top.png")
-
-        terrain_map = np.hstack((b1, c1))
-        topology_map = np.hstack((b1_top, c1_top))
-
-
-        
-        return terrain_map
-
-
+    @staticmethod
     def _add_mask_ontop(img_curr, mask_new, color_bgr):
         img_new = np.stack((
             np.round(mask_new/255 * color_bgr[0]),# + (1 - mask_curr/255) * img_curr[...,0]/255),
@@ -38,12 +20,27 @@ class Map:
         img_curr = cv2.addWeighted(img_curr, 1, img_new, 1, 0)# = mask_curr + mask_new#np.minimum(mask_curr + mask_new, 255)
 
         return img_curr
+
+    @staticmethod
+    def _add_mask_ontop2(img_curr, img_new, mask_new):
+        img_new = np.stack((
+            np.round(mask_new/255 * color_bgr[0]),# + (1 - mask_curr/255) * img_curr[...,0]/255),
+            np.round(mask_new/255 * color_bgr[1]),# + (1 - mask_curr/255) * img_curr[...,1]/255),
+            np.round(mask_new/255 * color_bgr[2])# + (1 - mask_curr/255) * img_curr[...,2]/255)
+            ), axis=2).astype("uint8")
+        #img_curr = np.multiply(img/255, mask_new/255) + np.multiply(img_curr, (1 - mask_curr/255))
+        img_curr = cv2.addWeighted(img_curr, 1, img_new, 1, 0)# = mask_curr + mask_new#np.minimum(mask_curr + mask_new, 255)
+
+        return img_curr
         
-    def get_ck3_map():
+    def set_ck3_map(self):
         
         river_map = cv2.imread("images/ck3map/rivers.png").astype("uint8")
         water_map = cv2.imread("images/ck3map/water.png").astype("uint8")
-        return water_map
+        self.map_img_original = water_map
+        self.map_img = self.map_img_original
+        return None
+        #return water_map
         height_map = cv2.imread("images/ck3map/heightmap.png").astype("uint8")
         provinces_map = cv2.imread("images/ck3map/provinces.png").astype("uint8")
 
@@ -105,9 +102,40 @@ class Map:
         #return np.where(water_map == 255, np.ones(river_map.shape) * (255, 0, 0), map)
         return map
 
-    def populate():
+    def get_map_img(self, frame: int):
+        return self.map_img
 
         # https://youtu.be/qq76LCiP2Ds
+
+
+
+    def add_object(self, map_object: "MapObject", is_static: bool) -> None:
+        if (is_static):
+            x1 = map_object.x - map_object.img.shape[1] // 2
+            y1 = map_object.y - map_object.img.shape[0] // 2
+            x2 = x1 + map_object.img.shape[1]
+            y2 = y1 + map_object.img.shape[0]
+
+            self.map_img[y1:y2, x1:x2] = self.map_img[y1:y2, x1:x2] + map_object.img * map_object.img_mask
+            self.static_objects.append(map_object)
+        else:
+            self.dynamic_objects.append(map_object)
+
+class MapObject:
+    def __init__(self, x: int, y: int, img: np.array, img_mask: np.array) -> None:
+        self.x = x
+        self.y = y
+        self.img = img
+        self.img_mask = img_mask
+
+class City(MapObject):
+    def __init__(self, x: int, y: int, name: str, img_file_path="images/assets/castle1_low.png"):
+        city_img = cv2.imread(img_file_path)
+        city_img_mask = cv2.cvtColor(city_img, cv2.COLOR_BGR2GRAY)
+        super().__init__(x, y, city_img, city_img_mask)
+
+        self.name = name
+
 
 if __name__ == "__main__":
     img = Map.get_ck3_map()

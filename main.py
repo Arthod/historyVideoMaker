@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from map import Map
+from map import Map, City, MapObject
 
 class Video:
     width = 1920
@@ -44,8 +44,10 @@ def center_on_image(img: np.array, x: int, y: int, zoom: float):
     return img
 
 if __name__ == "__main__":
-
-    img = Map.get_ck3_map()
+    map = Map()
+    map.set_ck3_map()
+    map.add_object(City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"), is_static=True)
+    map.add_object(City(3154, 3025, "Medina", img_file_path="images/assets/qwe.png"), is_static=True)
     print("Map creation completed")
 
 
@@ -57,8 +59,9 @@ if __name__ == "__main__":
     zoom_stages = [1] * fps_total
     xs = lerps_linear(3234, 3158, fps_total)
     ys = lerps_linear(3109, 2491, fps_total)
-    for i in range(fps_total):
-        img_final = center_on_image(img, xs[i], ys[i], zoom_stages[i])
+    for frame in range(fps_total):
+        img_map = map.get_map_img(frame)
+        img_final = center_on_image(img_map, xs[frame], ys[frame], zoom_stages[frame])
 
         shape = img_final.shape
         if (shape[0] != Video.height or shape[1] != Video.width):
