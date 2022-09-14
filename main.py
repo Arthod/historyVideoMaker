@@ -54,20 +54,20 @@ if __name__ == "__main__":
     video = cv2.VideoWriter('video.mp4', cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height))
     #video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*"MJPG"), fps, (Video.width, Video.height))
 
-    fps_total = 10 * Video.fps
+    fps_total = 5 * Video.fps
 
     zoom_stages = [1] * fps_total
     xs = lerps_linear(3234, 3158, fps_total)
-    ys = lerps_linear(3109, 2491, fps_total)
+    ys = lerps_linear(3109, 2791, fps_total)
     for frame in range(fps_total):
         img_map = map.get_map_img(frame)
         img_final = center_on_image(img_map, xs[frame], ys[frame], zoom_stages[frame])
 
         shape = img_final.shape
         if (shape[0] != Video.height or shape[1] != Video.width):
-            img_final = cv2.resize(img_final, (Video.width, Video.height), interpolation=cv2.INTER_CUBIC)
+            img_final = cv2.resize(img_final, (Video.width, Video.height), interpolation=cv2.INTER_AREA)
 
-        video.write(img_final)
+        video.write(img_final.astype("uint8"))
 
     video.release()
 

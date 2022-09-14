@@ -3,3 +3,5 @@
 *.mp4
 *.avi
 images/map/definition.csv
+*.pdn
+*.ttf
