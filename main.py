@@ -11,11 +11,6 @@ class Camera:
     width = 1920
     height = 1080
 
-class Video:
-    width = 1280
-    height = 720
-    fps = 60
-
 def lerps_linear(val_start: float, val_stop: float, count: int) -> list[float]:
     b = val_start
     a = (val_stop - b) / (count - 1)
@@ -47,18 +42,18 @@ if __name__ == "__main__":
     map = Map()
     map.set_ck3_map()
     map.add_object(City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"), is_static=True)
-    map.add_object(City(3154, 3025, "Medina", img_file_path="images/assets/qwe.png"), is_static=True)
+    map.add_object(City(3832, 3025, "Medina", img_file_path="images/assets/qwe.png"), is_static=True)
     print("Map creation completed")
 
 
-    video = cv2.VideoWriter('video.mp4', cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height))
-    #video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*"MJPG"), fps, (Video.width, Video.height))
+    #video = cv2.VideoWriter('video.mp4', cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height))
+    video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*"MJPG"), Video.fps, (Video.width, Video.height))
 
-    fps_total = 5 * Video.fps
+    fps_total = 50 * Video.fps
 
-    zoom_stages = [1] * fps_total
-    xs = lerps_linear(3234, 3158, fps_total)
-    ys = lerps_linear(3109, 2791, fps_total)
+    zoom_stages = lerps_linear(1, 4, 25 * Video.fps) + lerps_linear(4, 1, 25 * Video.fps)
+    xs = lerps_linear(1234, 5158, fps_total)
+    ys = lerps_linear(1109, 6791, fps_total)
     for frame in range(fps_total):
         img_map = map.get_map_img(frame)
         img_final = center_on_image(img_map, xs[frame], ys[frame], zoom_stages[frame])
