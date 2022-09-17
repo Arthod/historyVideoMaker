@@ -11,6 +11,11 @@ class Camera:
     width = 1920
     height = 1080
 
+class Video:
+    width = 1280
+    height = 720
+    fps = 60
+
 def lerps_linear(val_start: float, val_stop: float, count: int) -> list[float]:
     b = val_start
     a = (val_stop - b) / (count - 1)
@@ -46,12 +51,12 @@ if __name__ == "__main__":
     print("Map creation completed")
 
 
-    #video = cv2.VideoWriter('video.mp4', cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height))
-    video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*"MJPG"), Video.fps, (Video.width, Video.height))
+    video = cv2.VideoWriter('video.mp4', cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height))
+    #video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*"MJPG"), Video.fps, (Video.width, Video.height))
 
-    fps_total = 50 * Video.fps
+    fps_total = 10 * Video.fps
 
-    zoom_stages = lerps_linear(1, 4, 25 * Video.fps) + lerps_linear(4, 1, 25 * Video.fps)
+    zoom_stages = lerps_linear(1, 4, 5 * Video.fps) + lerps_linear(4, 1, 5 * Video.fps)
     xs = lerps_linear(1234, 5158, fps_total)
     ys = lerps_linear(1109, 6791, fps_total)
     for frame in range(fps_total):
