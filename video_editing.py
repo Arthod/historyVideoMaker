@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import cv2
 
@@ -44,7 +45,6 @@ def play_video(video_path):
             break
  
 
-
 class VideoSection:
     def __init__(self, frames_count, zooms, xs, ys):
         self.frames_count = frames_count
@@ -60,3 +60,32 @@ class VideoSection:
         assert self.frames_count == len(self.zooms)
         assert self.frames_count == len(self.xs)
         assert self.frames_count == len(self.ys)
+
+class VideoMaker(cv2.VideoWriter):
+    def __init__(self, out_path, fourcc, fps, video_size, camera_size):
+        super().__init__(out_path, fourcc, fps, video_size)
+        self.video_width, self.video_height = video_size
+        self.camera_width, self.camera_height = camera_size
+
+    def render(self, sections: list[VideoSection], map, verbose=0):
+        for i, section in enumerate(sections):
+            frames_count = section.frames_count
+            zooms = section.zooms
+            xs = section.xs
+            ys = section.ys
+
+            for frame in range(frames_count):
+                img_map = map.get_map_img(frame)
+                img_final = center_on_image(img_map, xs[frame], ys[frame], zooms[frame], self.camera_width, self.camera_height)
+
+                shape = img_final.shape
+                if (shape[0] != self.video_height or shape[1] != self.video_width):
+                    print("reshaping")
+                    img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_AREA)
+
+                self.write(img_final.astype("uint8"))
+
+                if (verbose >= 1):
+                    sys.stdout.write(f"\rSection {i + 1} / {len(sections)}, Frame {frame + 1} / {frames_count}")
+                    sys.stdout.flush()
+        print()
