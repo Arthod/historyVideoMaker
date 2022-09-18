@@ -9,8 +9,7 @@ import numpy as np
 class Map:
     def __init__(self):
         self.map_img = None
-        self.static_objects: list[MapObject] = []
-        self.dynamic_objects: list[MapObject] = []
+        self.objects: list[MapObject] = []
 
     @staticmethod
     def _overlay_rgb_mask(img_curr, img_path, color_rgb):
@@ -160,26 +159,27 @@ class Map:
 
         # https://youtu.be/qq76LCiP2Ds
 
-
-
     def add_object(self, map_object: "MapObject", is_static: bool) -> None:
-        if (is_static):
-            self.map_img = map_object.draw(self.map_img)
-            self.static_objects.append(map_object)
-        else:
-            self.dynamic_objects.append(map_object)
+        self.objects.append(map_object)
+
+    def initialize(self):
+        for object in self.objects:
+            if (object.is_static):
+                self.map_img = object.draw(self.map_img)
+
 
 class MapObject:
-    def __init__(self, x: int, y: int, img: np.array) -> None:
+    def __init__(self, x: int, y: int, img: np.array, is_static: bool) -> None:
         self.x = x
         self.y = y
         self.img = img
         self.angle = random.randint(0, 360)
+        self.is_static = is_static
 
 class City(MapObject):
     def __init__(self, x: int, y: int, name: str, img_file_path="images/assets/castle1_low.png"):
         city_img = cv2.imread(img_file_path, cv2.IMREAD_UNCHANGED)
-        super().__init__(x, y, city_img)
+        super().__init__(x, y, city_img, is_static=True)
 
         self.name = name
 

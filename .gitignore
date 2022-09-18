@@ -5,3 +5,6 @@
 images/map/definition.csv
 *.pdn
 *.ttf
+*.pyc
+*.pyc
+__pycache__/map.cpython-39.pyc

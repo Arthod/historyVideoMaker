@@ -1,6 +1,12 @@
 import cv2
 import numpy as np
 from map import Map, City, MapObject
+import utils
+import video_editing as ve
+from video_editing import VideoSection
+
+DEBUG_MODE = True
+HIGH_QUALITY = True
 
 class Video:
     width = 1920
@@ -11,89 +17,55 @@ class Camera:
     width = 1920
     height = 1080
 
-class Video:
-    width = 1280
-    height = 720
-    fps = 60
-
-def lerps_linear(val_start: float, val_stop: float, count: int) -> list[float]:
-    b = val_start
-    a = (val_stop - b) / (count - 1)
-    
-    return [a * i + b for i in range(count)]
-
-def lerps_expoential(val_start: float, val_stop: float, count: int) -> list[float]:
-    b = pow(val_stop / val_start, 1 / (count - 1))
-    a = val_start
-    return [a * pow(b, i) for i in range(count)]
-
-def crop_image(img: np.array, x: int, y: int, width: int, height: int) -> np.array:
-    return img[y:y + height, x:x + width]
-
-def center_on_image(img: np.array, x: int, y: int, zoom: float):
-    x_margin = round(Camera.width/2 * zoom)
-    x = round(max(min(x, img.shape[1] - x_margin), x_margin))
-
-    y_margin = round(Camera.height/2 * zoom)
-    y = round(max(min(y, img.shape[0] - y_margin), y_margin))
-
-    width = round(Camera.width * zoom)
-    height = round(Camera.height * zoom)
-
-    img = crop_image(img, x - width//2, y - height//2, width, height)
-    return img
 
 if __name__ == "__main__":
+    ## Map init
     map = Map()
     map.set_ck3_map()
     map.add_object(City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"), is_static=True)
     map.add_object(City(3832, 3025, "Medina", img_file_path="images/assets/qwe.png"), is_static=True)
+    map.initialize()
     print("Map creation completed")
 
+    ## Video writer init
+    out_video_path = "video.avi" if HIGH_QUALITY else "video.mp4"
+    if (HIGH_QUALITY):
+        video = cv2.VideoWriter("video.mp4", cv2.VideoWriter_fourcc(*"MPEG"), Video.fps, (Video.width, Video.height))
+    else:
+        video = cv2.VideoWriter(out_video_path, cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height))
 
-    video = cv2.VideoWriter('video.mp4', cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height))
-    #video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*"MJPG"), Video.fps, (Video.width, Video.height))
 
-    fps_total = 10 * Video.fps
+    # Video sections
+    fps_total = 5 * Video.fps
+    sections = [
+        VideoSection(
+            frames_count = fps_total,
+            zooms = [1] * fps_total,
+            xs = utils.lerps_linear(1234, 3158, fps_total),
+            ys = utils.lerps_linear(1109, 3791, fps_total)
+            )
+    ]
 
-    zoom_stages = lerps_linear(1, 4, 5 * Video.fps) + lerps_linear(4, 1, 5 * Video.fps)
-    xs = lerps_linear(1234, 5158, fps_total)
-    ys = lerps_linear(1109, 6791, fps_total)
-    for frame in range(fps_total):
-        img_map = map.get_map_img(frame)
-        img_final = center_on_image(img_map, xs[frame], ys[frame], zoom_stages[frame])
+    
+    for section in sections:
+        frames_count = section.frames_count
+        zooms = section.zooms
+        xs = section.xs
+        ys = section.ys
 
-        shape = img_final.shape
-        if (shape[0] != Video.height or shape[1] != Video.width):
-            img_final = cv2.resize(img_final, (Video.width, Video.height), interpolation=cv2.INTER_AREA)
+        for frame in range(frames_count):
+            img_map = map.get_map_img(frame)
+            img_final = ve.center_on_image(img_map, xs[frame], ys[frame], zooms[frame], Camera.width, Camera.height)
 
-        video.write(img_final.astype("uint8"))
+            shape = img_final.shape
+            if (shape[0] != Video.height or shape[1] != Video.width):
+                print("reshaping")
+                img_final = cv2.resize(img_final, (Video.width, Video.height), interpolation=cv2.INTER_AREA)
+
+            video.write(img_final.astype("uint8"))
 
     video.release()
 
     print("Rendering complete")
 
-
-    # Play video
-    cap = cv2.VideoCapture("video.mp4")
-    # Check if camera opened successfully
-    if (cap.isOpened()== False):
-        print("Error opening video file")
-    
-    # Read until video is completed
-    while(cap.isOpened()):
-        
-    # Capture frame-by-frame
-        ret, frame = cap.read()
-        if ret == True:
-        # Display the resulting frame
-            cv2.imshow('Frame', frame)
-            
-        # Press Q on keyboard to exit
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                break
-    
-    # Break the loop
-        else:
-            break
- 
+    ve.play_video(out_video_path)
