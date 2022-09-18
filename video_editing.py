@@ -46,7 +46,8 @@ def play_video(video_path):
  
 
 class VideoSection:
-    def __init__(self, frames_count, zooms, xs, ys):
+    def __init__(self, map, frames_count, zooms, xs, ys):
+        self.map = map
         self.frames_count = frames_count
         self.zooms = zooms
         self.xs = xs
@@ -67,8 +68,8 @@ class VideoMaker(cv2.VideoWriter):
         self.video_width, self.video_height = video_size
         self.camera_width, self.camera_height = camera_size
 
-    def render(self, sections: list[VideoSection], map, verbose=0):
-        for i, section in enumerate(sections):
+    def render_section(self, section: VideoSection, verbose=0):
+            map = section.map
             frames_count = section.frames_count
             zooms = section.zooms
             xs = section.xs
@@ -80,12 +81,11 @@ class VideoMaker(cv2.VideoWriter):
 
                 shape = img_final.shape
                 if (shape[0] != self.video_height or shape[1] != self.video_width):
-                    print("reshaping")
                     img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_AREA)
 
                 self.write(img_final.astype("uint8"))
 
-                if (verbose >= 1):
-                    sys.stdout.write(f"\rSection {i + 1} / {len(sections)}, Frame {frame + 1} / {frames_count}")
-                    sys.stdout.flush()
-        print()
+                #if (verbose >= 1):
+                #    sys.stdout.write(f"\rSection {i + 1} / {len(sections)}, Frame {frame + 1} / {frames_count}")
+                #    sys.stdout.flush()
+        #print()

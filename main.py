@@ -18,52 +18,64 @@ class Camera:
     width = 1920
     height = 1080
 
+class Video:
+    width = 1280
+    height = 768
+    fps = 60
+
 
 if __name__ == "__main__":
-    ## Cities
-    cities = {
-        "Mecca": City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"),
-        "Medina": City(3832, 3025, "Medina", img_file_path="images/assets/qwe.png")
-    }
-    
     ## Map init
     map = Map()
     map.set_ck3_map()
+    print("Base map created")
+
+    ## Cities
+    cities = {
+        "Cairo": City(3206, 3178, "Cairo", img_file_path="images/assets/qwe.png"),
+        "Mecca": City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"),
+        "Mecca": City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"),
+        "Medina": City(3832, 3025, "Medina", img_file_path="images/assets/qwe.png")
+    }
     for city_name, city in cities.items():
         map.add_object(city, is_static=True)
-    map.initialize()
-    print("Map creation completed")
+    print("Cities succesfully added")
+    
+    # Nations mask
+    nations_bgra = {
+        (14, 127, 0, 255): "Fatmid Caliphate",
+        (255, 148, 0, 255): "The Seljuks"
+    }
+    nations_mask = cv2.imread("history/testYear.png", flags=cv2.IMREAD_UNCHANGED)
+    map.set_nations_overlay(nations_mask, nations_bgra)
+    print("Nations succesfully added")
 
+    map.update_static(display_nation_names=True)
+    
     ## Video writer init
     out_video_path = "video.avi" if HIGH_QUALITY else "video.mp4"
-    if (HIGH_QUALITY):
-        video = VideoMaker("video.mp4", cv2.VideoWriter_fourcc(*"MPEG"), Video.fps, (Video.width, Video.height), (Camera.width, Camera.height))
-    else:
-        video = VideoMaker(out_video_path, cv2.VideoWriter_fourcc(*"mp4v"), Video.fps, (Video.width, Video.height), (Camera.width, Camera.height))
+    fourcc = cv2.VideoWriter_fourcc(*"MPEG") if HIGH_QUALITY else cv2.VideoWriter_fourcc(*"mp4v")
+
+    video = VideoMaker(out_video_path, fourcc, Video.fps, (Video.width, Video.height), (Camera.width, Camera.height))
 
 
-    # Nations mask
-    
-
-    # Video sections
+    # Video render sections & release
     sections = []
 
     fps_total = 5 * Video.fps
     mecca = cities["Mecca"]
     medina = cities["Medina"]
-    sections.append(
+    video.render_section(
         VideoSection(
+            map = map,
             frames_count = fps_total,
             zooms = [1] * fps_total,
-            xs = utils.lerps_expoential(mecca.x, medina.x, fps_total),
-            ys = utils.lerps_expoential(mecca.y, medina.y, fps_total)
+            xs = utils.lerps_exponential(mecca.x, medina.x, fps_total),
+            ys = utils.lerps_exponential(mecca.y, medina.y, fps_total)
             )
     )
-
-    # Video render & release
-    video.render(sections, map, verbose=1)
     video.release()
 
     print("Rendering complete")
 
-    #ve.play_video(out_video_path)
+    ve.play_video(out_video_path)
