@@ -39,12 +39,20 @@ def rotate_image(image, angle):
 
     return rotated
 
-def add_text(map_img, text, x, y, font, color):
-    x_shadow_offset = 1
-    y_shadow_offset = 1
+def add_text(map_img, text, pos, font, color, shadow_offset=None):
+    if (shadow_offset is None):
+        x_shadow_offset = 1
+        y_shadow_offset = 1
+    else:
+        x_shadow_offset, y_shadow_offset = shadow_offset
 
     img_pil = Image.fromarray(map_img)
     draw = ImageDraw.Draw(img_pil)
+
+    w, h = draw.textsize(text)
+    x, y = pos
+    x = x - w / 2
+    y = y - h / 2
 
     # Thin border
     draw.text((x - x_shadow_offset, y), text, font=font, fill=(0, 0, 0, 255), align="center")

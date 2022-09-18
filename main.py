@@ -1,7 +1,7 @@
 import secrets
 import cv2
 import numpy as np
-from map import Map, City, MapObject
+from map import Map, City, MapObject, Nation
 import utils
 import video_editing as ve
 from video_editing import VideoMaker, VideoSection
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     ## Cities
     cities = {
-        "Cairo": City(3206, 3178, "Cairo", img_file_path="images/assets/qwe.png"),
+        "Cairo": City(2751, 2822, "Cairo", img_file_path="images/assets/qwe.png"),
         "Mecca": City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"),
         "Mecca": City(3206, 3178, "Mecca", img_file_path="images/assets/qwe.png"),
         "Medina": City(3832, 3025, "Medina", img_file_path="images/assets/qwe.png")
@@ -42,12 +42,12 @@ if __name__ == "__main__":
     print("Cities succesfully added")
     
     # Nations mask
-    nations_bgra = {
-        (14, 127, 0, 255): "Fatmid Caliphate",
-        (255, 148, 0, 255): "The Seljuks"
-    }
+    nations = [
+        Nation("Fatmid Caliphate", (14, 127, 0, 255), (14, 87, 0, 255)),
+        Nation("Seljuk Empire", (255, 148, 0, 255), (200, 128, 0, 255)),
+    ]
     nations_mask = cv2.imread("history/testYear.png", flags=cv2.IMREAD_UNCHANGED)
-    map.set_nations_overlay(nations_mask, nations_bgra)
+    map.set_nations_overlay(nations_mask, nations)
     print("Nations succesfully added")
 
     map.update_static(display_nation_names=True)
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         VideoSection(
             map = map,
             frames_count = fps_total,
-            zooms = [1] * fps_total,
+            zooms = [2] * fps_total,
             xs = utils.lerps_exponential(mecca.x, medina.x, fps_total),
             ys = utils.lerps_exponential(mecca.y, medina.y, fps_total)
             )

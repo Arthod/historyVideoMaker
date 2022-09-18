@@ -13,7 +13,7 @@ class Map:
         self.objects: list[MapObject] = []
 
         self.nations_mask: np.array = None
-        self.nations_rgb: dict = None
+        self.nations: list[Nation] = None
 
     def generate_terrain_map(self):
         terrain_map = np.zeros(cv2.imread("images/ck3map/terrain.png").astype("uint8").shape)
@@ -137,9 +137,9 @@ class Map:
     def add_object(self, map_object: "MapObject", is_static: bool) -> None:
         self.objects.append(map_object)
     
-    def set_nations_overlay(self, nations_mask, nations_bgra):
+    def set_nations_overlay(self, nations_mask, nations):
         self.nations_mask = nations_mask
-        self.nations_bgra = nations_bgra
+        self.nations = nations
 
     def update_static(self, display_nation_names=True):
         map_img = np.copy(self.map_img_original)
@@ -148,15 +148,17 @@ class Map:
         map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
 
         if (display_nation_names):
-            for bgra, nation_name in self.nations_bgra.items():
-                
-                xs, ys = np.where(np.all(self.nations_mask == bgra, axis=-1))
+            for nation in self.nations:
+                # Calculate x and y pos's
+                ys, xs = np.where(np.all(self.nations_mask == nation.bgra, axis=-1))
                 assert len(xs) == len(ys)
                 x_avg = np.sum(xs) / len(xs)
                 y_avg = np.sum(ys) / len(ys)
+
                 
-                font = ImageFont.truetype("fonts/IMFeGPrm29P.ttf", 24)
-                map_img = add_text(map_img, nation_name.upper(), x_avg, y_avg, font, color=bgra)
+                
+                font = ImageFont.truetype("fonts/IMFeGPrm29P.ttf", 60)
+                map_img = add_text(map_img, nation.name.upper(), (x_avg, y_avg), font, color=nation.font_bgra, shadow_offset=(3, 3))
                 
 
         # Add objects
@@ -194,7 +196,17 @@ class City(MapObject):
         map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], img_rotated)
         
         font = ImageFont.truetype("fonts/IMFeGPrm29P.ttf", 24)
-        map_img = add_text(map_img, self.name.upper(), self.x - self.img.shape[1], self.y + 30, font=font, color=(255, 255, 255, 255))
+        map_img = add_text(map_img, self.name.upper(), (self.x, self.y + 30), font=font, color=(255, 255, 255, 255))
+
+        return map_img
+
+class Nation:
+    def __init__(self, name, bgra, font_bgra):
+        self.name = name
+        self.bgra = bgra
+        self.font_bgra = font_bgra
+
+    def draw(self, map_img: np.array):
 
         return map_img
 
