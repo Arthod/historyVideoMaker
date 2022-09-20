@@ -8,12 +8,14 @@ from utils import add_text, overlay_rgb_mask, add_foreground_image, rotate_image
 from PIL import ImageFont, ImageDraw, Image
 
 class Map:
-    def __init__(self):
-        self.map_img = None
+    def __init__(self, path: str):
+        self.map_img = cv2.imread(path).astype("uint8")
+        self.map_img_original = np.copy(self.map_img)
         self.objects: list[MapObject] = []
 
         self.nations_mask: np.array = None
         self.nations: list[Nation] = None
+        
 
     def generate_terrain_map(self):
         terrain_map = np.zeros(cv2.imread("images/ck3map/terrain.png").astype("uint8").shape)
@@ -107,27 +109,6 @@ class Map:
             
         return terrain_map
         
-    def set_ck3_map(self):
-        
-        # Terrain map
-        if (os.path.exists("metadata/terrain_map.png")):
-            terrain_map = cv2.imread("metadata/terrain_map.png").astype("uint8")
-        else:
-            terrain_map = self.generate_terrain_map()
-            cv2.imwrite("metadata/terrain_map.png", terrain_map)
-            print("Generating metadata - terrain map")
-
-        map = terrain_map
-
-        river_map = cv2.imread("images/ck3map/rivers.png").astype("uint8")
-        water_map = cv2.imread("images/ck3map/water.png").astype("uint8")
-        height_map = cv2.imread("images/ck3map/heightmap.png").astype("uint8")
-        provinces_map = cv2.imread("images/ck3map/provinces.png").astype("uint8")
-
-            
-        self.map_img_original = map
-        self.map_img = self.map_img_original
-        return self.map_img_original
 
     def get_map_img(self, frame: int):
         return self.map_img
@@ -179,8 +160,7 @@ class City(MapObject):
         x2 = x1 + self.img.shape[1]
         y2 = y1 + self.img.shape[0]
 
-        img_rotated = rotate_image(self.img, self.angle)
-        map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], img_rotated)
+        #map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], img_rotated)
         
         map_img = add_text(map_img, self.name.upper(), (self.x, self.y + 30), font_size=24, color=(255, 255, 255, 255))
 

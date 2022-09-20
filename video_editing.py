@@ -48,7 +48,15 @@ def play_video(video_path):
             break
  
 
-class VideoSection:
+class Section:
+    def __init__(self, frames_count: int, img: np.array):
+        self.frames_count = frames_count
+        
+    def next_img(self, frame: int):
+        raise NotImplementedError()
+
+
+class MapVideo(Section):
     def __init__(self, frames_count: int, map: Map, zooms, xs, ys):
         self.frames_count = frames_count
 
@@ -57,7 +65,10 @@ class VideoSection:
         self.xs = xs
         self.ys = ys
 
-class TransitionSection:
+    def next_img(self, frame: int):
+        return self.map.get_map_img(frame)
+
+class MapTransition(Section):
     def __init__(self, frames_count: int, map_img_old: np.array, map_img_new: np.array, zooms, xs, ys):
         self.frames_count = frames_count
 
@@ -65,6 +76,9 @@ class TransitionSection:
         self.zooms = zooms
         self.xs = xs
         self.ys = ys
+
+    def next_img(self, frame: int):
+        return next(self.map_img_transition)
 
 
 class VideoMaker(cv2.VideoWriter):
@@ -74,18 +88,14 @@ class VideoMaker(cv2.VideoWriter):
         self.camera_width, self.camera_height = camera_size
         self.verbose = verbose
 
-    def render_section(self, section: VideoSection):
+    def render_section(self, section: Section):
         frames_count = section.frames_count
         zooms = section.zooms
         xs = section.xs
         ys = section.ys
 
         for frame in range(frames_count):
-            if (type(section) is TransitionSection):
-                map_img = next(section.map_img_transition)
-
-            elif (type(section) is VideoSection):
-                map_img = section.map.get_map_img(0)
+            map_img = section.next_img(frame)
 
             img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame], self.camera_width, self.camera_height)
 
