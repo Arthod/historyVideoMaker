@@ -132,8 +132,6 @@ class Map:
     def get_map_img(self, frame: int):
         return self.map_img
 
-        # https://youtu.be/qq76LCiP2Ds
-
     def add_object(self, map_object: "MapObject", is_static: bool) -> None:
         self.objects.append(map_object)
     
@@ -149,16 +147,7 @@ class Map:
 
         if (display_nation_names):
             for nation in self.nations:
-                # Calculate x and y pos's
-                ys, xs = np.where(np.all(self.nations_mask == nation.bgra, axis=-1))
-                assert len(xs) == len(ys)
-                x_avg = np.sum(xs) / len(xs)
-                y_avg = np.sum(ys) / len(ys)
-
-                
-                
-                font = ImageFont.truetype("fonts/IMFeGPrm29P.ttf", 60)
-                map_img = add_text(map_img, nation.name.upper(), (x_avg, y_avg), font, color=nation.font_bgra, shadow_offset=(3, 3))
+                map_img = nation.draw(map_img, self.nations_mask)
                 
 
         # Add objects
@@ -167,8 +156,6 @@ class Map:
                 map_img = object.draw(map_img)
 
         self.map_img = map_img
-        
-        print("Static map updated")
 
 
 class MapObject:
@@ -195,18 +182,31 @@ class City(MapObject):
         img_rotated = rotate_image(self.img, self.angle)
         map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], img_rotated)
         
-        font = ImageFont.truetype("fonts/IMFeGPrm29P.ttf", 24)
-        map_img = add_text(map_img, self.name.upper(), (self.x, self.y + 30), font=font, color=(255, 255, 255, 255))
+        map_img = add_text(map_img, self.name.upper(), (self.x, self.y + 30), font_size=24, color=(255, 255, 255, 255))
 
         return map_img
 
 class Nation:
-    def __init__(self, name, bgra, font_bgra):
+    def __init__(self, name, bgra, font_bgra, capital: City):
         self.name = name
         self.bgra = bgra
         self.font_bgra = font_bgra
+        self.capital = capital
 
-    def draw(self, map_img: np.array):
+    def draw(self, map_img: np.array, nations_mask: np.array):
+        # Calculate x and y pos's
+        ys, xs = np.where(np.all(nations_mask == self.bgra, axis=-1))
+        assert len(xs) == len(ys)
+        x_avg = np.sum(xs) / len(xs)
+        y_avg = np.sum(ys) / len(ys)
+
+        # Weight towards capital
+        x = (x_avg + self.capital.x) // 2
+        y = (y_avg + self.capital.y) // 2
+
+        # Font & text position
+        font_size = round(len(xs) / len(self.name) / 500)
+        map_img = add_text(map_img, self.name.upper(), (x, y), font_size, color=self.font_bgra, shadow_offset=(2, 2))
 
         return map_img
 

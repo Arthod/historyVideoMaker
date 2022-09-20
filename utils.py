@@ -13,6 +13,11 @@ def lerps_exponential(val_start: float, val_stop: float, count: int) -> list[flo
     a = val_start
     return [a * pow(b, i) for i in range(count)]
 
+def lerps_img_transition(img_prev: np.array, img_next: np.array, count: int):
+    for i in range(count):
+        alpha = i / (count - 1)
+        yield img_prev * (1 - alpha) + img_next * alpha
+
 def overlay_rgb_mask(img_curr, img_path, color_rgb):
     mask_new = cv2.imread(img_path, flags=cv2.IMREAD_GRAYSCALE)
     #mask_new = np.minimum(mask_new.astype("uint32") * 2, 255).astype("uint8")
@@ -39,7 +44,7 @@ def rotate_image(image, angle):
 
     return rotated
 
-def add_text(map_img, text, pos, font, color, shadow_offset=None):
+def add_text(map_img, text, pos, font_size, color, shadow_offset=None):
     if (shadow_offset is None):
         x_shadow_offset = 1
         y_shadow_offset = 1
@@ -49,7 +54,9 @@ def add_text(map_img, text, pos, font, color, shadow_offset=None):
     img_pil = Image.fromarray(map_img)
     draw = ImageDraw.Draw(img_pil)
 
-    w, h = draw.textsize(text)
+    font = ImageFont.truetype("fonts/IMFeGPrm29P.ttf", font_size)
+
+    w, h = draw.textsize(text, font=font)
     x, y = pos
     x = x - w / 2
     y = y - h / 2

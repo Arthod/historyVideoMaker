@@ -1,6 +1,9 @@
 import sys
 import numpy as np
 import cv2
+import utils
+
+from map import Map
 
 
 def crop_image(img: np.array, x: int, y: int, width: int, height: int) -> np.array:
@@ -46,46 +49,53 @@ def play_video(video_path):
  
 
 class VideoSection:
-    def __init__(self, map, frames_count, zooms, xs, ys):
-        self.map = map
+    def __init__(self, frames_count: int, map: Map, zooms, xs, ys):
         self.frames_count = frames_count
+
+        self.map = map
         self.zooms = zooms
         self.xs = xs
         self.ys = ys
 
-        self._validate()
+class TransitionSection:
+    def __init__(self, frames_count: int, map_img_old: np.array, map_img_new: np.array, zooms, xs, ys):
+        self.frames_count = frames_count
 
+        self.map_img_transition = utils.lerps_img_transition(map_img_old, map_img_new, frames_count)
+        self.zooms = zooms
+        self.xs = xs
+        self.ys = ys
 
-    def _validate(self):
-        # Assert have same length
-        assert self.frames_count == len(self.zooms)
-        assert self.frames_count == len(self.xs)
-        assert self.frames_count == len(self.ys)
 
 class VideoMaker(cv2.VideoWriter):
-    def __init__(self, out_path, fourcc, fps, video_size, camera_size):
+    def __init__(self, out_path, fourcc, fps, video_size, camera_size, verbose=0):
         super().__init__(out_path, fourcc, fps, video_size)
         self.video_width, self.video_height = video_size
         self.camera_width, self.camera_height = camera_size
+        self.verbose = verbose
 
-    def render_section(self, section: VideoSection, verbose=0):
-            map = section.map
-            frames_count = section.frames_count
-            zooms = section.zooms
-            xs = section.xs
-            ys = section.ys
+    def render_section(self, section: VideoSection):
+        frames_count = section.frames_count
+        zooms = section.zooms
+        xs = section.xs
+        ys = section.ys
 
-            for frame in range(frames_count):
-                img_map = map.get_map_img(frame)
-                img_final = center_on_image(img_map, xs[frame], ys[frame], zooms[frame], self.camera_width, self.camera_height)
+        for frame in range(frames_count):
+            if (type(section) is TransitionSection):
+                map_img = next(section.map_img_transition)
 
-                shape = img_final.shape
-                if (shape[0] != self.video_height or shape[1] != self.video_width):
-                    img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_AREA)
+            elif (type(section) is VideoSection):
+                map_img = section.map.get_map_img(0)
 
-                self.write(img_final.astype("uint8"))
+            img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame], self.camera_width, self.camera_height)
 
-                #if (verbose >= 1):
-                #    sys.stdout.write(f"\rSection {i + 1} / {len(sections)}, Frame {frame + 1} / {frames_count}")
-                #    sys.stdout.flush()
-        #print()
+            shape = img_final.shape
+            if (shape[0] != self.video_height or shape[1] != self.video_width):
+                img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_AREA)
+
+            self.write(img_final.astype("uint8"))
+
+            if (self.verbose >= 1):
+                sys.stdout.write(f"\rFrame {frame + 1} / {frames_count}")
+                sys.stdout.flush()
+        print()

@@ -8,3 +8,4 @@ images/map/definition.csv
 *.pyc
 *.pyc
 __pycache__/map.cpython-39.pyc
+*.mov
