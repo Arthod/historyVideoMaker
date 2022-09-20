@@ -14,8 +14,8 @@ def lerps_exponential(val_start: float, val_stop: float, count: int) -> list[flo
     return [a * pow(b, i) for i in range(count)]
 
 def lerps_img_transition(img_prev: np.array, img_next: np.array, count: int):
-    precision = 5
-    for i in range(count//5):
+    precision = 1
+    for i in range(count//precision):
         alpha = (i * precision) / (count - 1)
         img = img_prev * (1 - alpha) + img_next * alpha
         for j in range(precision):

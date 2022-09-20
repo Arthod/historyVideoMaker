@@ -21,7 +21,7 @@ class Camera:
 class Video:
     width = 1920
     height = 1080
-    fps = 15
+    fps = 60
 
 
 if __name__ == "__main__":
@@ -35,7 +35,13 @@ if __name__ == "__main__":
         "Cairo": City(2751, 2822, "Cairo", img_file_path="images/assets/qwe.png"),
         "Isfahan": City(3713, 2544, "Isfahan", img_file_path="images/assets/qwe.png"),
         "Mecca": City(3191, 3186, "Mecca", img_file_path="images/assets/qwe.png"),
-        "Medina": City(3176, 3028, "Medina", img_file_path="images/assets/qwe.png")
+        "Medina": City(3176, 3028, "Medina", img_file_path="images/assets/qwe.png"),
+        "Baghdad": City(3470, 2607, "Baghdad", img_file_path="images/assets/qwe.png"),
+        "Basra": City(3550, 2690, "Basra", img_file_path="images/assets/qwe.png"),
+        "Al-Hasa": City(3669, 2937, "Al-Hasa", img_file_path="images/assets/qwe.png"),
+        "Constantinople": City(2585, 2127, "Constantinople", img_file_path="images/assets/qwe.png"),
+        "Shiraz": City(3791, 2744, "Shiraz", img_file_path="images/assets/qwe.png"),
+        "Bukhara": City(4255, 2114, "Bukhara", img_file_path="images/assets/qwe.png")
     }
     for city_name, city in cities.items():
         map_terrain.add_object(city, is_static=True)
@@ -43,12 +49,15 @@ if __name__ == "__main__":
     
     # Nations mask
     nations = [
-        Nation("Fatmid Caliphate", (14, 127, 0, 255), font_bgra=(14, 87, 0, 255), capital=cities["Cairo"]),
-        Nation("Seljuk Empire", (255, 148, 0, 255), font_bgra=(200, 128, 0, 255), capital=cities["Isfahan"]),
+        Nation("Abbasid Caliphate", (0, 127, 38, 255), capital=cities["Baghdad"]),
+        Nation("Qarmatians", (255, 255, 0, 255), capital=cities["Al-Hasa"]),
+        Nation("Byzantine Empire", (55, 0, 127, 255), capital=cities["Constantinople"]),
+        Nation("Saffarids", (59, 201, 211, 255), capital=cities["Shiraz"]),
+        Nation("Samanid Empire", (71, 140, 211, 255), capital=cities["Bukhara"]),
     ]
-    nations_mask = cv2.imread("history/testYear.png", flags=cv2.IMREAD_UNCHANGED)
-    map_sepia.set_nations_overlay(nations_mask, nations)
-    map_terrain.set_nations_overlay(nations_mask, nations)
+    year927_mask = cv2.imread("history/927.png", flags=cv2.IMREAD_UNCHANGED)
+    map_sepia.set_nations_overlay(year927_mask, nations)
+    map_terrain.set_nations_overlay(year927_mask, nations)
     print("Nations succesfully added")
 
 
@@ -75,13 +84,13 @@ if __name__ == "__main__":
         MapVideo(
             frames_count = fps_total,
             map = map_sepia,
-            zooms = [2] * fps_total,
+            zooms = [4] * fps_total,
             xs = utils.lerps_exponential(city1.x, city2.x, fps_total),
             ys = utils.lerps_exponential(city1.y, city2.y, fps_total)
             )
     )
 
-    fps_total = 3 * Video.fps
+    fps_total = 5 * Video.fps
     map_img_old = map_sepia.get_map_img(0)
     map_img_new = map_terrain.get_map_img(0)
 
@@ -90,7 +99,7 @@ if __name__ == "__main__":
             frames_count = fps_total,
             map_img_old = map_img_old,
             map_img_new = map_img_new,
-            zooms = utils.lerps_exponential(2, 1, fps_total),
+            zooms = utils.lerps_exponential(4, 1, fps_total),
             xs = [city2.x] * fps_total,
             ys = [city2.y] * fps_total
         )

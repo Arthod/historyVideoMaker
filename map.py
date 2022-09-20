@@ -163,16 +163,24 @@ class City(MapObject):
         #img_rotated = rotate_image(self.img, self.angle)
         map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], self.img)
         
-        map_img = add_text(map_img, self.name.upper(), (self.x, self.y + 30), font_size=24, color=(255, 255, 255, 255))
+        map_img = add_text(map_img, self.name.upper(), (self.x, self.y + 26), font_size=24, color=(255, 255, 255, 255))
 
         return map_img
 
 class Nation:
-    def __init__(self, name, bgra, font_bgra, capital: City):
+    def __init__(self, name, bgra, capital: City, font_bgra=None):
         self.name = name
         self.bgra = bgra
-        self.font_bgra = font_bgra
         self.capital = capital
+        
+        if (font_bgra is None):
+            self.font_bgra = (
+                max(0, bgra[0] - bgra[0] // 10),
+                max(0, bgra[1] - bgra[1] // 10),
+                max(0, bgra[2] - bgra[2] // 10)
+                )
+        else:
+            self.font_bgra = font_bgra
 
     def draw(self, map_img: np.array, nations_mask: np.array):
         # Calculate x and y pos's
