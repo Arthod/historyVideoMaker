@@ -173,34 +173,37 @@ class City(MapObject):
         return map_img
 
 class Nation:
-    def __init__(self, name, bgra, capital: City, font_bgra=None):
+    def __init__(self, name, bgra, capital: City, text_pos=None, text_font_size=None, text_angle=None, text_bgra=None):
         self.name = name
         self.bgra = bgra
         self.capital = capital
+
+        self.text_pos = text_pos
+        self.text_angle = text_angle
+        self.text_font_size = text_font_size
         
-        if (font_bgra is None):
-            self.font_bgra = (
+        if (text_bgra is None):
+            self.text_bgra = (
                 max(0, bgra[0] - bgra[0] // 10),
                 max(0, bgra[1] - bgra[1] // 10),
                 max(0, bgra[2] - bgra[2] // 10)
                 )
         else:
-            self.font_bgra = font_bgra
+            self.text_bgra = text_bgra
 
     def draw(self, map_img: np.array, nations_mask: np.array):
         # Calculate x and y pos's
-        ys, xs = np.where(np.all(nations_mask == self.bgra, axis=-1))
-        assert len(xs) == len(ys)
-        x_avg = np.sum(xs) / len(xs)
-        y_avg = np.sum(ys) / len(ys)
+        #ys, xs = np.where(np.all(nations_mask == self.bgra, axis=-1))
+        #assert len(xs) == len(ys)
+        #x_avg = np.sum(xs) / len(xs)
+        #y_avg = np.sum(ys) / len(ys)
 
         # Weight towards capital
-        x = (x_avg + self.capital.x) // 2
-        y = (y_avg + self.capital.y) // 2
+        #x = (x_avg + self.capital.x) // 2
+        #y = (y_avg + self.capital.y) // 2
 
         # Font & text position
-        font_size = round(len(xs) / len(self.name) / 1000)
-        map_img = add_text(map_img, self.name.upper(), (x, y), font_size, color=self.font_bgra, shadow_offset=(2, 2))
+        map_img = add_text(map_img, self.name.upper(), (x, y), self.font_size, color=self.text_bgra, shadow_offset=(2, 2), angle=self.name_angle)
 
         return map_img
 

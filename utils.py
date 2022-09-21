@@ -47,7 +47,7 @@ def rotate_image(image, angle):
 
     return rotated
 
-def add_text(map_img, text, pos, font_size, color, shadow_offset=None):
+def add_text(map_img, text, pos, font_size, color, shadow_offset=None, angle=None):
     if (shadow_offset is None):
         x_shadow_offset = 1
         y_shadow_offset = 1
