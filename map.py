@@ -7,10 +7,12 @@ import numpy as np
 from utils import add_text, overlay_rgb_mask, add_foreground_image, rotate_image
 from PIL import ImageFont, ImageDraw, Image
 
+from config import Config as CF
+
 class Map:
     def __init__(self, path: str):
-        self.map_img = cv2.imread(path).astype("uint8")
-        self.map_img_original = np.copy(self.map_img)
+        self.map_img_original = cv2.imread(path).astype("uint8")
+        self.map_img = None
         self.objects: list[MapObject] = []
 
         self.nations_mask: np.array = None
@@ -120,13 +122,14 @@ class Map:
         self.nations_mask = nations_mask
         self.nations = nations
 
-    def update_static(self, display_nation_names=True):
+    def update_static(self, display_nation_names):
         map_img = np.copy(self.map_img_original)
 
         # Nations mask overlay
-        map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
+        if (CF.NATION_DRAW_OVERLAY):
+            map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
 
-        if (display_nation_names):
+        if (display_nation_names and CF.NATION_DRAW_NAMES):
             for nation in self.nations:
                 map_img = nation.draw(map_img, self.nations_mask)
                 
@@ -150,7 +153,7 @@ class MapObject:
 class City(MapObject):
     def __init__(self, x: int, y: int, name: str, img_file_path="images/assets/castle1_low.png"):
         city_img = cv2.imread(img_file_path, cv2.IMREAD_UNCHANGED)
-        super().__init__(x, y, city_img, is_static=True)
+        super().__init__(x * CF.IMG_SCALE, y * CF.IMG_SCALE, city_img, is_static=True)
 
         self.name = name
 
@@ -161,9 +164,11 @@ class City(MapObject):
         y2 = y1 + self.img.shape[0]
 
         #img_rotated = rotate_image(self.img, self.angle)
-        map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], self.img)
+        if (CF.CITY_DRAW_SPRITE):
+            map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], self.img)
         
-        map_img = add_text(map_img, self.name, (self.x, self.y + 20), font_size=16, color=(255, 255, 255, 255))
+        if (CF.CITY_DRAW_NAMES):
+            map_img = add_text(map_img, self.name, (self.x, self.y + CF.CITY_NAME_Y_OFFSET), font_size=CF.CITY_NAME_FONT_SIZE, color=(255, 255, 255, 255))
 
         return map_img
 
@@ -194,7 +199,7 @@ class Nation:
         y = (y_avg + self.capital.y) // 2
 
         # Font & text position
-        font_size = round(len(xs) / len(self.name) / 500)
+        font_size = round(len(xs) / len(self.name) / 1000)
         map_img = add_text(map_img, self.name.upper(), (x, y), font_size, color=self.font_bgra, shadow_offset=(2, 2))
 
         return map_img

@@ -6,28 +6,11 @@ import utils
 import video_editing as ve
 from video_editing import MapTransition, MapVideo, VideoMaker
 
-DEBUG_MODE = True
-HIGH_QUALITY = False
-
-class Video:
-    width = 1920
-    height = 1080
-    fps = 60
-
-class Camera:
-    width = 1920
-    height = 1080
-
-class Video:
-    width = 1920
-    height = 1080
-    fps = 30
-
+from config import Config as CF
 
 if __name__ == "__main__":
     ## Map init
-    map_terrain = Map(path="metadata/map_terrain.png")
-    map_sepia = Map(path="metadata/map_sepia.png")
+    map_terrain = Map(path=CF.IMG_PATH)
     print("Base map created")
 
     ## Cities
@@ -54,40 +37,59 @@ if __name__ == "__main__":
         Nation("Byzantine Empire", (55, 0, 127, 255), capital=cities["Constantinople"]),
         Nation("Saffarids", (59, 201, 211, 255), capital=cities["Shiraz"]),
         Nation("Samanid Empire", (71, 140, 211, 255), capital=cities["Bukhara"]),
+        Nation("Oman", (213, 170, 128, 255), capital=cities["Bukhara"]),
     ]
     year927_mask = cv2.imread("history/927.png", flags=cv2.IMREAD_UNCHANGED)
-    map_sepia.set_nations_overlay(year927_mask, nations)
     map_terrain.set_nations_overlay(year927_mask, nations)
     print("Nations succesfully added")
 
 
     # Initialize maps
-    map_sepia.update_static(display_nation_names=True)
-    map_terrain.update_static(display_nation_names=False)
+    map_terrain.update_static(display_nation_names=True)
     print("Static maps succesfully updated")
 
     
     ## Video writer init
-    out_video_path = "video.avi" if HIGH_QUALITY else "video.mp4"
-    fourcc = cv2.VideoWriter_fourcc(*"MPEG") if HIGH_QUALITY else cv2.VideoWriter_fourcc(*"mp4v")
-
-    video = VideoMaker(out_video_path, fourcc, Video.fps, (Video.width, Video.height), (Camera.width, Camera.height), high_quality=HIGH_QUALITY, verbose=1)
+    out_video_path = CF.OUT_VIDEO_PATH
+    fourcc = cv2.VideoWriter_fourcc(*CF.OUT_VIDEO_FOURCC)
+    video = VideoMaker(out_video_path, fourcc, CF.VIDEO_FPS, (CF.VIDEO_WIDTH, CF.VIDEO_HEIGHT), (CF.CAMERA_WIDTH, CF.CAMERA_HEIGHT), high_quality=CF.HIGH_QUALITY, verbose=1)
 
 
     # Video render sections & release
     sections = []
 
-    city1 = cities["Mecca"]
-    city2 = cities["Isfahan"]
+    city1 = cities["Constantinople"]
+    city2 = cities["Mecca"]
 
-    fps_total = 5 * Video.fps
+    fps_total = 5 * CF.VIDEO_FPS
     video.render_section(
         MapVideo(
             frames_count = fps_total,
             map = map_terrain,
             zooms = [1] * fps_total,
-            xs = [2221] * fps_total,
-            ys = [2000] * fps_total
+            xs = [city1.x] * fps_total,
+            ys = [city1.y] * fps_total
+        )
+    )
+    
+    video.render_section(
+        MapVideo(
+            frames_count = fps_total,
+            map = map_terrain,
+            zooms = utils.lerps_exponential(1, 2, int(fps_total//2)) + utils.lerps_exponential(2, 1, int(fps_total//2)),
+            xs = utils.lerps_linear(city1.x, city2.x, fps_total),
+            ys = utils.lerps_linear(city1.y, city2.y, fps_total),
+        )
+    )
+
+    fps_total = 5 * CF.VIDEO_FPS
+    video.render_section(
+        MapVideo(
+            frames_count = fps_total,
+            map = map_terrain,
+            zooms = [1] * fps_total,
+            xs = [city2.x] * fps_total,
+            ys = [city2.y] * fps_total
         )
     )
 

@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from PIL import ImageFont, ImageDraw, Image
 
+from config import Config as CF
+
 def lerps_linear(val_start: float, val_stop: float, count: int) -> list[float]:
     b = val_start
     a = (val_stop - b) / (count - 1)
@@ -55,7 +57,7 @@ def add_text(map_img, text, pos, font_size, color, shadow_offset=None):
     img_pil = Image.fromarray(map_img)
     draw = ImageDraw.Draw(img_pil)
 
-    font = ImageFont.truetype("fonts/IMFeGPrm29P.ttf", font_size)
+    font = ImageFont.truetype(CF.CITY_NAME_FONT_PATH, font_size)
 
     w, h = draw.textsize(text, font=font)
     x, y = pos

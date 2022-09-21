@@ -5,6 +5,8 @@ import utils
 
 from map import Map
 
+from config import Config as CF
+
 
 def crop_image(img: np.array, x: int, y: int, width: int, height: int) -> np.array:
     return img[y:y + height, x:x + width]
@@ -102,7 +104,7 @@ class VideoMaker(cv2.VideoWriter):
             if (self.high_quality):
                 map_img = section.next_img(frame)
 
-            img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame], self.camera_width, self.camera_height)
+            img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame] * CF.IMG_SCALE, self.camera_width, self.camera_height)
 
             shape = img_final.shape
             if (shape[0] != self.video_height or shape[1] != self.video_width):

@@ -1,4 +1,4 @@
 import cairosvg
 
 # read svg file -> write png file
-cairosvg.svg2png(url="water.svg", write_to="out.png", output_width=16384, output_height=8192)
+cairosvg.svg2png(url="out.svg", write_to="out2.png", output_width=32766, output_height=16384)
