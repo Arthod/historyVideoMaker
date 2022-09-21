@@ -32,12 +32,18 @@ if __name__ == "__main__":
     
     # Nations mask
     nations = [
-        Nation("Abbasid Caliphate", (0, 127, 38, 255), capital=cities["Baghdad"]),
-        Nation("Qarmatians", (255, 255, 0, 255), capital=cities["Al-Hasa"]),
-        Nation("Byzantine Empire", (55, 0, 127, 255), capital=cities["Constantinople"]),
-        Nation("Saffarids", (59, 201, 211, 255), capital=cities["Shiraz"]),
-        Nation("Samanid Empire", (71, 140, 211, 255), capital=cities["Bukhara"]),
-        Nation("Oman", (213, 170, 128, 255), capital=cities["Bukhara"]),
+        Nation("Abbasid Caliphate", (0, 127, 38, 255), cities["Baghdad"], 
+            (3050, 2677), 80, 25),
+        Nation("Qarmatians", (255, 255, 0, 255), cities["Al-Hasa"],
+            (3690, 2930), 50, -43),
+        Nation("Byzantine Empire", (55, 0, 127, 255), cities["Constantinople"],
+            (2850, 2240), 65, 18),
+        Nation("Saffarids", (59, 201, 211, 255), cities["Shiraz"],
+            (3870, 2720), 55, -20),
+        Nation("Samanid Empire", (71, 140, 211, 255), cities["Bukhara"],
+            (4179, 2385), 80, 0),
+        Nation("Oman", (213, 170, 128, 255), cities["Bukhara"],
+            (4053, 3072), 40, 300),
     ]
     year927_mask = cv2.imread("history/927.png", flags=cv2.IMREAD_UNCHANGED)
     map_terrain.set_nations_overlay(year927_mask, nations)
@@ -66,12 +72,12 @@ if __name__ == "__main__":
         MapVideo(
             frames_count = fps_total,
             map = map_terrain,
-            zooms = [1] * fps_total,
-            xs = [city1.x] * fps_total,
-            ys = [city1.y] * fps_total
+            zooms = [2] * fps_total,
+            xs = [city2.x] * fps_total,
+            ys = [city2.y] * fps_total
         )
     )
-    
+    """
     video.render_section(
         MapVideo(
             frames_count = fps_total,
@@ -91,10 +97,10 @@ if __name__ == "__main__":
             xs = [city2.x] * fps_total,
             ys = [city2.y] * fps_total
         )
-    )
+    )"""
 
     video.release()
 
     print("Rendering complete")
 
-    #ve.play_video(out_video_path)
+    ve.play_video(out_video_path)

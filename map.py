@@ -168,12 +168,12 @@ class City(MapObject):
             map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], self.img)
         
         if (CF.CITY_DRAW_NAMES):
-            map_img = add_text(map_img, self.name, (self.x, self.y + CF.CITY_NAME_Y_OFFSET), font_size=CF.CITY_NAME_FONT_SIZE, color=(255, 255, 255, 255))
+            map_img = add_text(map_img, self.name, (self.x, self.y + CF.CITY_NAME_Y_OFFSET), CF.CITY_NAME_FONT_SIZE, (255, 255, 255, 255), (1, 1), 0)
 
         return map_img
 
 class Nation:
-    def __init__(self, name, bgra, capital: City, text_pos=None, text_font_size=None, text_angle=None, text_bgra=None):
+    def __init__(self, name, bgra, capital: City, text_pos, text_font_size, text_angle, text_bgra=None):
         self.name = name
         self.bgra = bgra
         self.capital = capital
@@ -203,7 +203,7 @@ class Nation:
         #y = (y_avg + self.capital.y) // 2
 
         # Font & text position
-        map_img = add_text(map_img, self.name.upper(), (x, y), self.font_size, color=self.text_bgra, shadow_offset=(2, 2), angle=self.name_angle)
+        map_img = add_text(map_img, self.name.upper(), self.text_pos, self.text_font_size, color=self.text_bgra, shadow_offset=(2, 2), angle=self.text_angle)
 
         return map_img
 

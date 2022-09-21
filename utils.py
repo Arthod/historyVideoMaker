@@ -47,35 +47,38 @@ def rotate_image(image, angle):
 
     return rotated
 
-def add_text(map_img, text, pos, font_size, color, shadow_offset=None, angle=None):
-    if (shadow_offset is None):
-        x_shadow_offset = 1
-        y_shadow_offset = 1
-    else:
-        x_shadow_offset, y_shadow_offset = shadow_offset
-
+def add_text(map_img, text, pos, font_size, color, shadow_offset, angle):
+    font = ImageFont.truetype(CF.CITY_NAME_FONT_PATH, font_size)
     img_pil = Image.fromarray(map_img)
     draw = ImageDraw.Draw(img_pil)
-
-    font = ImageFont.truetype(CF.CITY_NAME_FONT_PATH, font_size)
-
     w, h = draw.textsize(text, font=font)
-    x, y = pos
-    x = x - w / 2
-    y = y - h / 2
+
+    size = max(w, h)
+    text_img = np.zeros((size + shadow_offset[1] * 2, size + shadow_offset[0] * 2, 4)).astype("uint8")
+    img_pil = Image.fromarray(text_img)
+    draw = ImageDraw.Draw(img_pil)
 
     # Thin border
-    draw.text((x - x_shadow_offset, y), text, font=font, fill=(0, 0, 0, 255), align="center")
-    draw.text((x + x_shadow_offset, y), text, font=font, fill=(0, 0, 0, 255), align="center")
-    draw.text((x, y - y_shadow_offset), text, font=font, fill=(0, 0, 0, 255), align="center")
-    draw.text((x, y + y_shadow_offset), text, font=font, fill=(0, 0, 0, 255), align="center")
+    x = shadow_offset[0]
+    y = shadow_offset[1] + ((size - h) // 2)
+    draw.text((x - shadow_offset[0], y), text, font=font, fill=(0, 0, 0, 255), align="center")
+    draw.text((x + shadow_offset[0], y), text, font=font, fill=(0, 0, 0, 255), align="center")
+    draw.text((x, y - shadow_offset[1]), text, font=font, fill=(0, 0, 0, 255), align="center")
+    draw.text((x, y + shadow_offset[1]), text, font=font, fill=(0, 0, 0, 255), align="center")
 
     # Thick border
-    draw.text((x - x_shadow_offset, y - y_shadow_offset), text, font=font, fill=(0, 0, 0, 255), align="center")
-    draw.text((x + x_shadow_offset, y - y_shadow_offset), text, font=font, fill=(0, 0, 0, 255), align="center")
-    draw.text((x - x_shadow_offset, y + y_shadow_offset), text, font=font, fill=(0, 0, 0, 255), align="center")
-    draw.text((x + x_shadow_offset, y + y_shadow_offset), text, font=font, fill=(0, 0, 0, 255), align="center")
+    draw.text((x - shadow_offset[0], y - shadow_offset[1]), text, font=font, fill=(0, 0, 0, 255), align="center")
+    draw.text((x + shadow_offset[0], y - shadow_offset[1]), text, font=font, fill=(0, 0, 0, 255), align="center")
+    draw.text((x - shadow_offset[0], y + shadow_offset[1]), text, font=font, fill=(0, 0, 0, 255), align="center")
+    draw.text((x + shadow_offset[0], y + shadow_offset[1]), text, font=font, fill=(0, 0, 0, 255), align="center")
 
     draw.text((x, y), text, font=font, fill=color, align="center")
-    map_img = np.array(img_pil)
+
+    x = int(pos[0] - size / 2)
+    y = int(pos[1] - size / 2)
+    text_img = rotate_image(np.array(img_pil), angle)
+    
+    #text_img = cv2.cvtColor(text_img, cv2.COLOR_BGR2BGRA)
+    map_img[y:y + text_img.shape[0], x:x + text_img.shape[1]] = add_foreground_image(map_img[y:y + text_img.shape[0], x:x + text_img.shape[1]], text_img, alpha=1)
+
     return map_img
