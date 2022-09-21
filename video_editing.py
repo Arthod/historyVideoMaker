@@ -106,7 +106,7 @@ class VideoMaker(cv2.VideoWriter):
 
             shape = img_final.shape
             if (shape[0] != self.video_height or shape[1] != self.video_width):
-                img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_AREA)
+                img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_CUBIC)
 
             self.write(img_final.astype("uint8"))
 

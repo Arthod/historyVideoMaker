@@ -10,3 +10,4 @@ images/map/definition.csv
 __pycache__/map.cpython-39.pyc
 *.mov
 *.pyc
+*.svg

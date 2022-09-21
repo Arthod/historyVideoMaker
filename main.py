@@ -86,8 +86,8 @@ if __name__ == "__main__":
             frames_count = fps_total,
             map = map_terrain,
             zooms = [1] * fps_total,
-            xs = [city2.x] * fps_total,
-            ys = [city2.y] * fps_total
+            xs = [2221] * fps_total,
+            ys = [2000] * fps_total
         )
     )
 
@@ -95,4 +95,4 @@ if __name__ == "__main__":
 
     print("Rendering complete")
 
-    ve.play_video(out_video_path)
+    #ve.play_video(out_video_path)
