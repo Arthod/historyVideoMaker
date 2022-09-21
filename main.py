@@ -21,7 +21,7 @@ class Camera:
 class Video:
     width = 1920
     height = 1080
-    fps = 60
+    fps = 30
 
 
 if __name__ == "__main__":
@@ -71,39 +71,14 @@ if __name__ == "__main__":
     out_video_path = "video.avi" if HIGH_QUALITY else "video.mp4"
     fourcc = cv2.VideoWriter_fourcc(*"MPEG") if HIGH_QUALITY else cv2.VideoWriter_fourcc(*"mp4v")
 
-    video = VideoMaker(out_video_path, fourcc, Video.fps, (Video.width, Video.height), (Camera.width, Camera.height), verbose=1)
+    video = VideoMaker(out_video_path, fourcc, Video.fps, (Video.width, Video.height), (Camera.width, Camera.height), high_quality=HIGH_QUALITY, verbose=1)
 
 
     # Video render sections & release
     sections = []
 
-    fps_total = 5 * Video.fps
     city1 = cities["Mecca"]
     city2 = cities["Isfahan"]
-    video.render_section(
-        MapVideo(
-            frames_count = fps_total,
-            map = map_sepia,
-            zooms = [4] * fps_total,
-            xs = utils.lerps_exponential(city1.x, city2.x, fps_total),
-            ys = utils.lerps_exponential(city1.y, city2.y, fps_total)
-            )
-    )
-
-    fps_total = 5 * Video.fps
-    map_img_old = map_sepia.get_map_img(0)
-    map_img_new = map_terrain.get_map_img(0)
-
-    video.render_section(
-        MapTransition(
-            frames_count = fps_total,
-            map_img_old = map_img_old,
-            map_img_new = map_img_new,
-            zooms = utils.lerps_exponential(4, 1, fps_total),
-            xs = [city2.x] * fps_total,
-            ys = [city2.y] * fps_total
-        )
-    )
 
     fps_total = 5 * Video.fps
     video.render_section(

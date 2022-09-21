@@ -82,11 +82,12 @@ class MapTransition(Section):
 
 
 class VideoMaker(cv2.VideoWriter):
-    def __init__(self, out_path, fourcc, fps, video_size, camera_size, verbose=0):
+    def __init__(self, out_path, fourcc, fps, video_size, camera_size, high_quality, verbose=0):
         super().__init__(out_path, fourcc, fps, video_size)
         self.video_width, self.video_height = video_size
         self.camera_width, self.camera_height = camera_size
         self.verbose = verbose
+        self.high_quality = high_quality
 
     def render_section(self, section: Section):
         frames_count = section.frames_count
@@ -94,8 +95,12 @@ class VideoMaker(cv2.VideoWriter):
         xs = section.xs
         ys = section.ys
 
+        if (not self.high_quality):
+            map_img = section.next_img(0)
+
         for frame in range(frames_count):
-            map_img = section.next_img(frame)
+            if (self.high_quality):
+                map_img = section.next_img(frame)
 
             img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame], self.camera_width, self.camera_height)
 

@@ -163,7 +163,7 @@ class City(MapObject):
         #img_rotated = rotate_image(self.img, self.angle)
         map_img[y1:y2, x1:x2] = add_foreground_image(map_img[y1:y2, x1:x2], self.img)
         
-        map_img = add_text(map_img, self.name.upper(), (self.x, self.y + 26), font_size=24, color=(255, 255, 255, 255))
+        map_img = add_text(map_img, self.name, (self.x, self.y + 20), font_size=16, color=(255, 255, 255, 255))
 
         return map_img
 
