@@ -45,7 +45,7 @@ if __name__ == "__main__":
         Nation("Oman", (213, 170, 128, 255), cities["Bukhara"],
             (4053, 3072), 40, 300),
     ]
-    year927_mask = cv2.imread("history/927.png", flags=cv2.IMREAD_UNCHANGED)
+    year927_mask = cv2.imread("history/927big.png", flags=cv2.IMREAD_UNCHANGED)
     map_terrain.set_nations_overlay(year927_mask, nations)
     print("Nations succesfully added")
 

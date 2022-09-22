@@ -178,9 +178,9 @@ class Nation:
         self.bgra = bgra
         self.capital = capital
 
-        self.text_pos = text_pos
+        self.text_pos = (text_pos[0] * CF.IMG_SCALE, text_pos[1] * CF.IMG_SCALE)
         self.text_angle = text_angle
-        self.text_font_size = text_font_size
+        self.text_font_size = text_font_size * CF.IMG_SCALE
         
         if (text_bgra is None):
             self.text_bgra = (
