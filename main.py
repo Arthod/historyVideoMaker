@@ -24,7 +24,17 @@ if __name__ == "__main__":
         "Al-Hasa": City(3669, 2937, "Al-Hasa", img_file_path="images/assets/qwe.png"),
         "Constantinople": City(2585, 2127, "Constantinople", img_file_path="images/assets/qwe.png"),
         "Shiraz": City(3791, 2744, "Shiraz", img_file_path="images/assets/qwe.png"),
-        "Bukhara": City(4255, 2114, "Bukhara", img_file_path="images/assets/qwe.png")
+        "Bukhara": City(4255, 2114, "Bukhara", img_file_path="images/assets/qwe.png"),
+        "Jerusalem": City(2965, 2634, "Jerusalem", img_file_path="images/assets/qwe.png"),
+        "Damascus": City(3026, 2602, "Damascus", img_file_path="images/assets/qwe.png"),
+        "Hormuz": City(4005, 2829, "Damascus", img_file_path="images/assets/qwe.png"),
+        "Siraf": City(3771, 2812, "Siraf"),
+        "Suhar": City(3996, 2969, "Suhar"),
+        "Daba": City(3972, 2908, "Daba"),
+        "Jullafar": City(3946, 2905, "Jullafar"),
+        "Al-Masqat": City(4083, 3001, "Al-Masqat"),
+        "Bahrain": City(3962, 2906, "Bahrain"),
+        "Kufa": City(3381, 2613, "Kufa"),
     }
     for city_name, city in cities.items():
         map_terrain.add_object(city, is_static=True)
@@ -45,7 +55,7 @@ if __name__ == "__main__":
         Nation("Oman", (213, 170, 128, 255), cities["Bukhara"],
             (4053, 3072), 40, 300),
     ]
-    year927_mask = cv2.imread("history/927big.png", flags=cv2.IMREAD_UNCHANGED)
+    year927_mask = cv2.imread("history/927.png", flags=cv2.IMREAD_UNCHANGED)
     map_terrain.set_nations_overlay(year927_mask, nations)
     print("Nations succesfully added")
 
@@ -64,8 +74,8 @@ if __name__ == "__main__":
     # Video render sections & release
     sections = []
 
-    city1 = cities["Constantinople"]
-    city2 = cities["Mecca"]
+    city1 = cities["Mecca"]
+    city2 = cities["Al-Hasa"]
 
     fps_total = 5 * CF.VIDEO_FPS
     video.render_section(
@@ -73,6 +83,26 @@ if __name__ == "__main__":
             frames_count = fps_total,
             map = map_terrain,
             zooms = [2] * fps_total,
+            xs = [city1.x] * fps_total,
+            ys = [city1.y] * fps_total
+        )
+    )
+    fps_total = 5 * CF.VIDEO_FPS
+    video.render_section(
+        MapVideo(
+            frames_count = fps_total,
+            map = map_terrain,
+            zooms = utils.lerps_exponential(2, 0.5, fps_total),
+            xs = utils.lerps_linear(city1.x, city2.x, fps_total),
+            ys = utils.lerps_linear(city1.y, city2.y, fps_total),
+        )
+    )
+    fps_total = 5 * CF.VIDEO_FPS
+    video.render_section(
+        MapVideo(
+            frames_count = fps_total,
+            map = map_terrain,
+            zooms = [0.5] * fps_total,
             xs = [city2.x] * fps_total,
             ys = [city2.y] * fps_total
         )

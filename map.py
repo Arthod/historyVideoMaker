@@ -151,7 +151,7 @@ class MapObject:
         self.is_static = is_static
 
 class City(MapObject):
-    def __init__(self, x: int, y: int, name: str, img_file_path="images/assets/castle1_low.png"):
+    def __init__(self, x: int, y: int, name: str, img_file_path="images/assets/qwe.png"):
         city_img = cv2.imread(img_file_path, cv2.IMREAD_UNCHANGED)
         super().__init__(x * CF.IMG_SCALE, y * CF.IMG_SCALE, city_img, is_static=True)
 
