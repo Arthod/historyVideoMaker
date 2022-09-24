@@ -5,9 +5,9 @@ class Config:
     OUT_VIDEO_PATH = "video.avi" if HIGH_QUALITY else "video.mp4"
     OUT_VIDEO_FOURCC = "MPEG" if HIGH_QUALITY else "mp4v"
 
-    IMG_PATH = "metadata/interesting2.png" # metadata/interesting.png
+    IMG_PATH = "metadata/interesting.png" # metadata/interesting.png
 
-    IMG_SCALE = 1
+    IMG_SCALE = 4
 
     CAMERA_WIDTH = 1920
     CAMERA_HEIGHT = 1080
