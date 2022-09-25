@@ -16,6 +16,7 @@ if __name__ == "__main__":
     ## Cities
     cities = {
         # https://www.worldhistory.org/uploads/images/15330.png?v=1647975399
+        # https://upload.wikimedia.org/wikipedia/commons/a/ad/Abbasid_Caliphate_891-892.png
         # Egypt and Levantine
         "Cairo": City(2751, 2822, "Cairo"),
         "Alexandria": City(2697, 2770, "Alexandria"),
@@ -55,6 +56,9 @@ if __name__ == "__main__":
         "Aden": City(3473, 3566, "Aden"),
         "Qatif": City(3659, 2881, "Qatif"),
         "Zubala": City(3366, 2811, "Zubala"),
+        "Jiddah": City(3157, 3152, "Jiddah"),
+        "Sana": City(3409, 3488, "Sana"),
+        "Najran": City(3468, 3344, "Najran"),
 
         # Iraq
         "Kufa": City(3381, 2613, "Kufa"),
