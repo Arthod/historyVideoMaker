@@ -10,7 +10,7 @@ from config import Config as CF
 
 if __name__ == "__main__":
     ## Map init
-    map_terrain = Map(path=CF.IMG_PATH)
+    map_terrain = Map(path=CF.IMG_MAIN_PATH)
     print("Base map created")
 
     ## Cities
@@ -55,8 +55,8 @@ if __name__ == "__main__":
         Nation("Oman", (213, 170, 128, 255), cities["Bukhara"],
             (4053, 3072), 40, 300),
     ]
-    year927_mask = cv2.imread("history/900big.png", flags=cv2.IMREAD_UNCHANGED)
-    map_terrain.set_nations_overlay(year927_mask, nations)
+    year900_mask = cv2.imread(CF.IMG_HISTORY_PATH + "/900.png", flags=cv2.IMREAD_UNCHANGED)
+    map_terrain.set_nations_overlay(year900_mask, nations)
     print("Nations succesfully added")
 
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     ## Video writer init
     out_video_path = CF.OUT_VIDEO_PATH
     fourcc = cv2.VideoWriter_fourcc(*CF.OUT_VIDEO_FOURCC)
-    video = VideoMaker(out_video_path, fourcc, CF.VIDEO_FPS, (CF.VIDEO_WIDTH, CF.VIDEO_HEIGHT), (CF.CAMERA_WIDTH, CF.CAMERA_HEIGHT), high_quality=CF.HIGH_QUALITY, verbose=1)
+    video = VideoMaker(out_video_path, fourcc, CF.VIDEO_FPS, (CF.VIDEO_WIDTH, CF.VIDEO_HEIGHT), (CF.CAMERA_WIDTH, CF.CAMERA_HEIGHT), verbose=1)
 
 
     # Video render sections & release
@@ -87,12 +87,12 @@ if __name__ == "__main__":
             ys = [city1.y] * fps_total
         )
     )
-    fps_total = 5 * CF.VIDEO_FPS
+    fps_total = 10 * CF.VIDEO_FPS
     video.render_section(
         MapVideo(
             frames_count = fps_total,
             map = map_terrain,
-            zooms = utils.lerps_exponential(2, 0.5, fps_total),
+            zooms = utils.lerps_exponential(2, 0.25, fps_total),
             xs = utils.lerps_linear(city1.x, city2.x, fps_total),
             ys = utils.lerps_linear(city1.y, city2.y, fps_total),
         )

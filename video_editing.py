@@ -84,12 +84,11 @@ class MapTransition(Section):
 
 
 class VideoMaker(cv2.VideoWriter):
-    def __init__(self, out_path, fourcc, fps, video_size, camera_size, high_quality, verbose=0):
+    def __init__(self, out_path, fourcc, fps, video_size, camera_size, verbose=0):
         super().__init__(out_path, fourcc, fps, video_size)
         self.video_width, self.video_height = video_size
         self.camera_width, self.camera_height = camera_size
         self.verbose = verbose
-        self.high_quality = high_quality
 
     def render_section(self, section: Section):
         frames_count = section.frames_count
@@ -97,18 +96,21 @@ class VideoMaker(cv2.VideoWriter):
         xs = section.xs
         ys = section.ys
 
-        if (not self.high_quality):
+        if (not CF.IS_STILL_FRAMES):
             map_img = section.next_img(0)
 
         for frame in range(frames_count):
-            if (self.high_quality):
+            if (CF.IS_STILL_FRAMES):
                 map_img = section.next_img(frame)
 
             img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame] * CF.IMG_SCALE, self.camera_width, self.camera_height)
 
             shape = img_final.shape
             if (shape[0] != self.video_height or shape[1] != self.video_width):
-                img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_CUBIC)
+                if (shape[0] < self.video_height): # We need to enlargen the image
+                    img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_CUBIC)
+                else: # We need to shrink the image
+                    img_final = cv2.resize(img_final, (self.video_width, self.video_height), interpolation=cv2.INTER_AREA)
 
             self.write(img_final.astype("uint8"))
 
