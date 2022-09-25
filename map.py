@@ -129,15 +129,15 @@ class Map:
         if (CF.NATION_DRAW_OVERLAY):
             map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
 
-        if (display_nation_names and CF.NATION_DRAW_NAMES):
-            for nation in self.nations:
-                map_img = nation.draw(map_img, self.nations_mask)
-                
-
         # Add objects
         for object in self.objects:
             if (object.is_static):
                 map_img = object.draw(map_img)
+
+        # Nation names overlay
+        if (display_nation_names and CF.NATION_DRAW_NAMES):
+            for nation in self.nations:
+                map_img = nation.draw(map_img, self.nations_mask)
 
         self.map_img = map_img
 
@@ -151,7 +151,7 @@ class MapObject:
         self.is_static = is_static
 
 class City(MapObject):
-    def __init__(self, x: int, y: int, name: str, img_file_path="images/assets/qwe.png"):
+    def __init__(self, x: int, y: int, name: str, img_file_path=f"{CF.IMG_ASSETS_PATH}/castle.png"):
         city_img = cv2.imread(img_file_path, cv2.IMREAD_UNCHANGED)
         super().__init__(x * CF.IMG_SCALE, y * CF.IMG_SCALE, city_img, is_static=True)
 

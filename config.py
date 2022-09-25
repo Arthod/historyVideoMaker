@@ -1,6 +1,6 @@
 class Config:
     DEBUG_MODE = True
-    HIGH_QUALITY = True
+    HIGH_QUALITY = False
     IS_STILL_FRAMES = HIGH_QUALITY # Whether map_get_img should get next frame during render_section
     IS_FULL_HD = HIGH_QUALITY # If it is FULL HD
     IS_BIG_MAP = HIGH_QUALITY
@@ -12,6 +12,7 @@ class Config:
 
     IMG_BIG_OR_SMALL = "big" if IS_BIG_MAP else "small"
     IMG_HISTORY_PATH = f"history/{IMG_BIG_OR_SMALL}"
+    IMG_ASSETS_PATH = f"images/assets/{IMG_BIG_OR_SMALL}"
     IMG_MAIN_PATH = f"metadata/{IMG_BIG_OR_SMALL}/map.png"
 
     IMG_SCALE = 4 if IS_BIG_MAP else 1
