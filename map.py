@@ -124,15 +124,18 @@ class Map:
 
     def update_static(self, display_nation_names):
         map_img = np.copy(self.map_img_original)
+        print("Copied image")
 
         # Nations mask overlay
         if (CF.NATION_DRAW_OVERLAY):
             map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
+        print("Added foreground")
 
         # Add objects
         for object in self.objects:
             if (object.is_static):
                 map_img = object.draw(map_img)
+        print("Added objects")
 
         # Nation names overlay
         if (display_nation_names and CF.NATION_DRAW_NAMES):
@@ -140,6 +143,7 @@ class Map:
                 map_img = nation.draw(map_img, self.nations_mask)
 
         self.map_img = map_img
+        print("Added names")
 
 
 class MapObject:

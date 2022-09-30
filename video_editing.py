@@ -53,9 +53,6 @@ def play_video(video_path):
 class Section:
     def __init__(self, frames_count: int, img: np.array):
         self.frames_count = frames_count
-        
-    def next_img(self, frame: int):
-        raise NotImplementedError()
 
 
 class MapVideo(Section):

@@ -31,10 +31,23 @@ def overlay_rgb_mask(img_curr, img_path, color_rgb):
     ), axis=2), 255).astype("uint8")
 
 def add_foreground_image(img_curr, img_ontop, alpha=1):
+    if (alpha == 1):
+        alpha_foreground = (img_ontop[:,:,3] / 255.0) * alpha
+        alpha_foreground_inv = (1 - alpha_foreground)
+
+        for color in range(0, 3):
+            img_curr[:,:,color] = img_ontop[:,:,color] * alpha_foreground + img_curr[:,:,color] * alpha_foreground_inv
+
+        return img_curr
+
+    else:
+        pass
+        return cv2.addWeighted(img_curr, 1 - alpha, img_ontop[...,0:3], alpha, 0)
     alpha_foreground = (img_ontop[:,:,3] / 255.0) * alpha
+    alpha_foreground_inv = (1 - alpha_foreground)
 
     for color in range(0, 3):
-        img_curr[:,:,color] = (alpha_foreground) * img_ontop[:,:,color] + img_curr[:,:,color] * (1 - alpha_foreground)
+        img_curr[:,:,color] = img_ontop[:,:,color] * alpha_foreground + img_curr[:,:,color] * alpha_foreground_inv
 
     return img_curr
 
@@ -49,8 +62,7 @@ def rotate_image(image, angle):
 
 def add_text(map_img, text, pos, font_size, color, shadow_offset, angle):
     font = ImageFont.truetype(CF.CITY_NAME_FONT_PATH, font_size)
-    img_pil = Image.fromarray(map_img)
-    draw = ImageDraw.Draw(img_pil)
+    draw = ImageDraw.Draw(Image.fromarray(np.zeros((1, 1))))
     w, h = draw.textsize(text, font=font)
 
     size = max(w, h)
@@ -79,6 +91,6 @@ def add_text(map_img, text, pos, font_size, color, shadow_offset, angle):
     text_img = rotate_image(np.array(img_pil), angle)
     
     #text_img = cv2.cvtColor(text_img, cv2.COLOR_BGR2BGRA)
-    map_img[y:y + text_img.shape[0], x:x + text_img.shape[1]] = add_foreground_image(map_img[y:y + text_img.shape[0], x:x + text_img.shape[1]], text_img, alpha=1)
+    map_img[y:y + text_img.shape[0], x:x + text_img.shape[1]] = add_foreground_image(map_img[y:y + text_img.shape[0], x:x + text_img.shape[1]], text_img)
 
     return map_img
