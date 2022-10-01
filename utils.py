@@ -31,18 +31,6 @@ def overlay_rgb_mask(img_curr, img_path, color_rgb):
     ), axis=2), 255).astype("uint8")
 
 def add_foreground_image(img_curr, img_ontop, alpha=1):
-    if (alpha == 1):
-        alpha_foreground = (img_ontop[:,:,3] / 255.0) * alpha
-        alpha_foreground_inv = (1 - alpha_foreground)
-
-        for color in range(0, 3):
-            img_curr[:,:,color] = img_ontop[:,:,color] * alpha_foreground + img_curr[:,:,color] * alpha_foreground_inv
-
-        return img_curr
-
-    else:
-        pass
-        return cv2.addWeighted(img_curr, 1 - alpha, img_ontop[...,0:3], alpha, 0)
     alpha_foreground = (img_ontop[:,:,3] / 255.0) * alpha
     alpha_foreground_inv = (1 - alpha_foreground)
 
@@ -50,6 +38,8 @@ def add_foreground_image(img_curr, img_ontop, alpha=1):
         img_curr[:,:,color] = img_ontop[:,:,color] * alpha_foreground + img_curr[:,:,color] * alpha_foreground_inv
 
     return img_curr
+
+    return cv2.addWeighted(img_curr, alpha, img_ontop[...,0:3], 0.5, 0)
 
 def rotate_image(image, angle):
     h, w = image.shape[:2]

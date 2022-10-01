@@ -118,8 +118,7 @@ class Map:
     def add_object(self, map_object: "MapObject", is_static: bool) -> None:
         self.objects.append(map_object)
     
-    def set_nations_overlay(self, nations_mask, nations):
-        self.nations_mask = nations_mask
+    def set_nations(self, nations):
         self.nations = nations
 
     def update_static(self, display_nation_names):
@@ -127,9 +126,9 @@ class Map:
         print("Copied image")
 
         # Nations mask overlay
-        if (CF.NATION_DRAW_OVERLAY):
-            map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
-        print("Added foreground")
+        #if (CF.NATION_DRAW_OVERLAY):
+        #    map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
+        #print("Added foreground")
 
         # Add objects
         for object in self.objects:

@@ -147,8 +147,6 @@ if __name__ == "__main__":
         "Amalfi": City(1811, 2203, "Amalfi"),
         "Bari": City(1925, 2171, "Bari"),
         "Messina": City(1851, 2383, "Messina"),
-
-
     }
     for city_name, city in cities.items():
         map_terrain.add_object(city, is_static=True)
@@ -164,10 +162,8 @@ if __name__ == "__main__":
         Nation("Oman", (213, 170, 128, 255), cities["Suhar"], (4073, 3072), 46, 300),
         Nation("Tulunids", (0, 127, 147, 255), cities["Cairo"], (2680, 2815), 80, 5),
     ]
-    year900_mask = cv2.imread(CF.IMG_HISTORY_PATH + "/900.png", flags=cv2.IMREAD_UNCHANGED)
-    map_terrain.set_nations_overlay(year900_mask, nations)
+    map_terrain.nations = nations
     print("Nations succesfully added")
-
 
     # Initialize maps
     map_terrain.update_static(display_nation_names=True)
@@ -178,7 +174,6 @@ if __name__ == "__main__":
     out_video_path = CF.OUT_VIDEO_PATH
     fourcc = cv2.VideoWriter_fourcc(*CF.OUT_VIDEO_FOURCC)
     video = VideoMaker(out_video_path, fourcc, CF.VIDEO_FPS, (CF.VIDEO_WIDTH, CF.VIDEO_HEIGHT), (CF.CAMERA_WIDTH, CF.CAMERA_HEIGHT), verbose=1)
-
 
     # Video render sections & release
     sections = []
