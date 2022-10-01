@@ -181,7 +181,7 @@ if __name__ == "__main__":
     city1 = cities["Mecca"]
     city2 = cities["Baghdad"]
 
-    if (True):
+    if (False):
         img = map_terrain.get_map_img(0)
         img = ve.center_on_image(img, city2.x, city2.y, 1, CF.CAMERA_WIDTH, CF.CAMERA_HEIGHT)
         shape = img.shape
@@ -197,19 +197,21 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
 
     else:
+        fps_total = 5 * CF.VIDEO_FPS
         video.render_section(
             MapVideo(
                 frames_count = fps_total,
                 map = map_terrain,
-                zooms = utils.lerps_exponential(1, 2, int(fps_total//2)) + utils.lerps_exponential(2, 1, int(fps_total//2)),
+                zooms = utils.lerps_exponential(1, 2, int(fps_total // 2)) + utils.lerps_exponential(2, 1, int(fps_total // 2)),
                 xs = utils.lerps_linear(city1.x, city2.x, fps_total),
                 ys = utils.lerps_linear(city1.y, city2.y, fps_total),
+                history_year = 900
             )
         )
 
         fps_total = 5 * CF.VIDEO_FPS
         video.render_section(
-            MapVideo(
+            MapTransition(
                 frames_count = fps_total,
                 map = map_terrain,
                 zooms = [1] * fps_total,

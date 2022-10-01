@@ -56,13 +56,14 @@ class Section:
 
 
 class MapVideo(Section):
-    def __init__(self, frames_count: int, map: Map, zooms, xs, ys):
+    def __init__(self, frames_count: int, map: Map, zooms, xs, ys, history_year: int):
         self.frames_count = frames_count
 
         self.map = map
         self.zooms = zooms
         self.xs = xs
         self.ys = ys
+        self.history_year = history_year
 
     def next_img(self, frame: int):
         return self.map.get_map_img(frame)
