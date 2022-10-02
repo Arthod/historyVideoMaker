@@ -195,37 +195,48 @@ if __name__ == "__main__":
     else:
         Section.map = map
 
+        fps_total = 5 * CF.VIDEO_FPS
+        video.render_section(
+            Section(
+                frames_count = fps_total,
+                zooms = [2] * fps_total,#utils.lerps_exponential(1, 2, int(fps_total // 2)) + utils.lerps_exponential(2, 1, int(fps_total // 2)),
+                xs = utils.lerps_linear(city1.x, city2.x, fps_total),
+                ys = utils.lerps_linear(city1.y, city2.y, fps_total),
+                history_year = "900"
+            )
+        )
+        
         fps_total = 1 * CF.VIDEO_FPS
         video.render_section(
             Section(
                 frames_count = fps_total,
-                zooms = [1] * fps_total,#utils.lerps_exponential(1, 2, int(fps_total // 2)) + utils.lerps_exponential(2, 1, int(fps_total // 2)),
-                xs = utils.lerps_linear(city1.x, city2.x, fps_total),
-                ys = utils.lerps_linear(city1.y, city2.y, fps_total),
-                history_year = 900
+                zooms = [1] * fps_total,
+                xs = [city2.x] * fps_total,
+                ys = [city2.y] * fps_total,
+                history_year = f"900",
+                history_year_new = f"900_1",
             )
         )
-
-        fps_total = 2 * CF.VIDEO_FPS
+        for i in range(2, 10):
+            fps_total = 1 * CF.VIDEO_FPS
+            video.render_section(
+                Section(
+                    frames_count = fps_total,
+                    zooms = [1] * fps_total,
+                    xs = [city2.x] * fps_total,
+                    ys = [city2.y] * fps_total,
+                    history_year = f"900_{i - 1}",
+                    history_year_new = f"900_{i}",
+                )
+            )
+        fps_total = 5 * CF.VIDEO_FPS
         video.render_section(
             Section(
                 frames_count = fps_total,
                 zooms = [1] * fps_total,
                 xs = [city2.x] * fps_total,
                 ys = [city2.y] * fps_total,
-                history_year = 900,
-                history_year_new = 901
-            )
-        )
-
-        fps_total = 2 * CF.VIDEO_FPS
-        video.render_section(
-            Section(
-                frames_count = fps_total,
-                zooms = [1] * fps_total,
-                xs = [city2.x] * fps_total,
-                ys = [city2.y] * fps_total,
-                history_year = 901,
+                history_year = f"900_{i}",
             )
         )
 
