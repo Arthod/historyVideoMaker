@@ -175,7 +175,7 @@ if __name__ == "__main__":
     sections = []
 
     city1 = cities["Mecca"]
-    city2 = cities["Baghdad"]
+    city2 = cities["Qatif"]
 
     if (False):
         img = map_terrain.get_map_img(0)
@@ -210,19 +210,19 @@ if __name__ == "__main__":
         video.render_section(
             Section(
                 frames_count = fps_total,
-                zooms = [1] * fps_total,
+                zooms = [0.5] * fps_total,
                 xs = [city2.x] * fps_total,
                 ys = [city2.y] * fps_total,
                 history_year = f"900",
                 history_year_new = f"900_1",
             )
         )
-        for i in range(2, 10):
+        for i in range(0):#2, 10):
             fps_total = 1 * CF.VIDEO_FPS
             video.render_section(
                 Section(
                     frames_count = fps_total,
-                    zooms = [1] * fps_total,
+                    zooms = [0.5] * fps_total,
                     xs = [city2.x] * fps_total,
                     ys = [city2.y] * fps_total,
                     history_year = f"900_{i - 1}",
@@ -233,10 +233,10 @@ if __name__ == "__main__":
         video.render_section(
             Section(
                 frames_count = fps_total,
-                zooms = [1] * fps_total,
+                zooms = [0.5] * fps_total,
                 xs = [city2.x] * fps_total,
                 ys = [city2.y] * fps_total,
-                history_year = f"900_{i}",
+                history_year = f"900_{9}",
             )
         )
 
