@@ -18,8 +18,9 @@ def lerps_exponential(val_start: float, val_stop: float, count: int) -> list[flo
 def lerps_img_transition(img_prev: np.array, img_next: np.array, count: int):
     for i in range(count):
         alpha = i / (count - 1)
-        img = img_prev * (1 - alpha) + img_next * alpha
-        yield img
+        yield cv2.addWeighted(img_prev, 1 - alpha, img_next, alpha, 0)
+        #yield img_prev * (1 - alpha) + img_next * alpha
+        #yield img
 
 def overlay_rgb_mask(img_curr, img_path, color_rgb):
     mask_new = cv2.imread(img_path, flags=cv2.IMREAD_GRAYSCALE)

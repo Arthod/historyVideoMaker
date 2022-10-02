@@ -11,11 +11,9 @@ from config import Config as CF
 
 class Map:
     def __init__(self, path: str):
-        self.map_img_original = cv2.imread(path).astype("uint8")
-        self.map_img = None
+        self.map_img = cv2.imread(path)
         self.objects: list[MapObject] = []
 
-        self.nations_mask: np.array = None
         self.nations: list[Nation] = None
         
 
@@ -110,10 +108,6 @@ class Map:
         terrain_map = overlay_rgb_mask(terrain_map, "images/ck3map/terrain/wetlands_02_mud_mask.png", (34, 41, 14))
             
         return terrain_map
-        
-
-    def get_map_img(self, frame: int):
-        return self.map_img
 
     def add_object(self, map_object: "MapObject", is_static: bool) -> None:
         self.objects.append(map_object)
@@ -121,28 +115,22 @@ class Map:
     def set_nations(self, nations):
         self.nations = nations
 
-    def update_static(self, display_nation_names):
-        map_img = np.copy(self.map_img_original)
+    def populate_map(self, img: np.array):
         print("Copied image")
-
-        # Nations mask overlay
-        #if (CF.NATION_DRAW_OVERLAY):
-        #    map_img = add_foreground_image(map_img, self.nations_mask, alpha=0.5)
-        #print("Added foreground")
 
         # Add objects
         for object in self.objects:
             if (object.is_static):
-                map_img = object.draw(map_img)
+                img = object.draw(img)
         print("Added objects")
 
         # Nation names overlay
-        if (display_nation_names and CF.NATION_DRAW_NAMES):
+        if (CF.NATION_DRAW_NAMES):
             for nation in self.nations:
-                map_img = nation.draw(map_img, self.nations_mask)
+                img = nation.draw(img)
+        print("Drew nation names overlay")
 
-        self.map_img = map_img
-        print("Added names")
+        return img
 
 
 class MapObject:
@@ -194,17 +182,7 @@ class Nation:
         else:
             self.text_bgra = text_bgra
 
-    def draw(self, map_img: np.array, nations_mask: np.array):
-        # Calculate x and y pos's
-        #ys, xs = np.where(np.all(nations_mask == self.bgra, axis=-1))
-        #assert len(xs) == len(ys)
-        #x_avg = np.sum(xs) / len(xs)
-        #y_avg = np.sum(ys) / len(ys)
-
-        # Weight towards capital
-        #x = (x_avg + self.capital.x) // 2
-        #y = (y_avg + self.capital.y) // 2
-
+    def draw(self, map_img: np.array):
         # Font & text position
         map_img = add_text(map_img, self.name.upper(), self.text_pos, self.text_font_size, color=self.text_bgra, shadow_offset=(2, 2), angle=self.text_angle)
 

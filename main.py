@@ -4,13 +4,13 @@ import numpy as np
 from map import Map, City, Nation
 import utils
 import video_editing as ve
-from video_editing import MapTransition, MapVideo, VideoMaker
+from video_editing import Section, VideoMaker
 
 from config import Config as CF
 
 if __name__ == "__main__":
     ## Map init
-    map_terrain = Map(path=CF.IMG_MAIN_PATH)
+    map = Map(path=f"{CF.IMG_MAIN_PATH}")
     print("Base map created")
 
     ## Cities
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         "Messina": City(1851, 2383, "Messina"),
     }
     for city_name, city in cities.items():
-        map_terrain.add_object(city, is_static=True)
+        map.add_object(city, is_static=True)
     print("Cities succesfully added")
     
     # Nations mask
@@ -162,12 +162,8 @@ if __name__ == "__main__":
         Nation("Oman", (213, 170, 128, 255), cities["Suhar"], (4073, 3072), 46, 300),
         Nation("Tulunids", (0, 127, 147, 255), cities["Cairo"], (2680, 2815), 80, 5),
     ]
-    map_terrain.nations = nations
+    map.nations = nations
     print("Nations succesfully added")
-
-    # Initialize maps
-    map_terrain.update_static(display_nation_names=True)
-    print("Static maps succesfully updated")
 
     
     ## Video writer init
@@ -197,26 +193,39 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
 
     else:
-        fps_total = 5 * CF.VIDEO_FPS
+        Section.map = map
+
+        fps_total = 1 * CF.VIDEO_FPS
         video.render_section(
-            MapVideo(
+            Section(
                 frames_count = fps_total,
-                map = map_terrain,
-                zooms = utils.lerps_exponential(1, 2, int(fps_total // 2)) + utils.lerps_exponential(2, 1, int(fps_total // 2)),
+                zooms = [1] * fps_total,#utils.lerps_exponential(1, 2, int(fps_total // 2)) + utils.lerps_exponential(2, 1, int(fps_total // 2)),
                 xs = utils.lerps_linear(city1.x, city2.x, fps_total),
                 ys = utils.lerps_linear(city1.y, city2.y, fps_total),
                 history_year = 900
             )
         )
 
-        fps_total = 5 * CF.VIDEO_FPS
+        fps_total = 2 * CF.VIDEO_FPS
         video.render_section(
-            MapTransition(
+            Section(
                 frames_count = fps_total,
-                map = map_terrain,
                 zooms = [1] * fps_total,
                 xs = [city2.x] * fps_total,
-                ys = [city2.y] * fps_total
+                ys = [city2.y] * fps_total,
+                history_year = 900,
+                history_year_new = 901
+            )
+        )
+
+        fps_total = 2 * CF.VIDEO_FPS
+        video.render_section(
+            Section(
+                frames_count = fps_total,
+                zooms = [1] * fps_total,
+                xs = [city2.x] * fps_total,
+                ys = [city2.y] * fps_total,
+                history_year = 901,
             )
         )
 

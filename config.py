@@ -1,11 +1,15 @@
 class Config:
     DEBUG_MODE = True
     HIGH_QUALITY = False
-    IS_STILL_FRAMES = HIGH_QUALITY # Whether map_get_img should get next frame during render_section
+    IS_STILL_FRAMES = True # Whether map_get_img should get next frame during render_section
     IS_FULL_HD = HIGH_QUALITY # If it is FULL HD
     IS_BIG_MAP = HIGH_QUALITY
     IS_GOOD_FOURCC = False
 
+    IMG_SCALE = 4 if IS_BIG_MAP else 1
+
+    WORLD_MAP_WIDTH = 8192 * IMG_SCALE
+    WORLD_MAP_HEIGHT = 4096 * IMG_SCALE
 
     OUT_VIDEO_PATH = "video.avi" if IS_GOOD_FOURCC else "video.mp4"
     OUT_VIDEO_FOURCC = "MPEG" if IS_GOOD_FOURCC else "mp4v"
@@ -14,8 +18,6 @@ class Config:
     IMG_HISTORY_PATH = f"history/{IMG_BIG_OR_SMALL}"
     IMG_ASSETS_PATH = f"images/assets/{IMG_BIG_OR_SMALL}"
     IMG_MAIN_PATH = f"metadata/{IMG_BIG_OR_SMALL}/map.png"
-
-    IMG_SCALE = 4 if IS_BIG_MAP else 1
 
     CAMERA_WIDTH = 1920 * IMG_SCALE
     CAMERA_HEIGHT = 1080 * IMG_SCALE

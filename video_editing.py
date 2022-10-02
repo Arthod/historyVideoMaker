@@ -49,36 +49,47 @@ def play_video(video_path):
         else:
             break
  
-
 class Section:
-    def __init__(self, frames_count: int, img: np.array):
+    year = None
+    map: Map = None
+    map_img = None
+    map_img_generator = None
+
+    def __init__(self, frames_count: int, zooms, xs, ys, history_year: int, history_year_new: int=None):
         self.frames_count = frames_count
-
-
-class MapVideo(Section):
-    def __init__(self, frames_count: int, map: Map, zooms, xs, ys, history_year: int):
-        self.frames_count = frames_count
-
-        self.map = map
         self.zooms = zooms
         self.xs = xs
         self.ys = ys
         self.history_year = history_year
+        self.history_year_new = history_year_new
+
+        # Read history years
+        if (Section.year is None):
+            Section.map_img = utils.add_foreground_image(
+                np.copy(Section.map.map_img),
+                cv2.imread(f"{CF.IMG_HISTORY_PATH}/{history_year}.png", cv2.IMREAD_UNCHANGED),
+                alpha=0.5
+                )
+            Section.map_img = Section.map.populate_map(Section.map_img)
+            Section.year = history_year
+
+        if (history_year_new is None):
+            Section.map_img_generator = (Section.map_img for _ in range(frames_count))
+
+        else:
+            map_img_next = utils.add_foreground_image(
+                np.copy(Section.map.map_img), 
+                cv2.imread(f"{CF.IMG_HISTORY_PATH}/{history_year_new}.png", cv2.IMREAD_UNCHANGED), 
+                alpha=0.5
+                )
+            map_img_next = Section.map.populate_map(map_img_next)
+            Section.map_img_generator = utils.lerps_img_transition(Section.map_img, map_img_next, frames_count)
+            Section.map_img = map_img_next
+            Section.year = history_year_new
+
 
     def next_img(self, frame: int):
-        return self.map.get_map_img(frame)
-
-class MapTransition(Section):
-    def __init__(self, frames_count: int, map_img_old: np.array, map_img_new: np.array, zooms, xs, ys):
-        self.frames_count = frames_count
-
-        self.map_img_transition = utils.lerps_img_transition(map_img_old, map_img_new, frames_count)
-        self.zooms = zooms
-        self.xs = xs
-        self.ys = ys
-
-    def next_img(self, frame: int):
-        return next(self.map_img_transition)
+        return next(Section.map_img_generator)
 
 
 class VideoMaker(cv2.VideoWriter):
@@ -101,7 +112,7 @@ class VideoMaker(cv2.VideoWriter):
             if (CF.IS_STILL_FRAMES):
                 map_img = section.next_img(frame)
 
-            img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame] * CF.IMG_SCALE, self.camera_width, self.camera_height)
+            img_final = center_on_image(map_img, xs[frame], ys[frame], zooms[frame], self.camera_width, self.camera_height)
 
             shape = img_final.shape
             if (shape[0] != self.video_height or shape[1] != self.video_width):
